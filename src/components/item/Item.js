@@ -4,7 +4,7 @@ import "./item.css";
 function Item({ name, rating, price, saleDiscount, image, brand }) {
   return (
     <div className="item-card">
-      <img src={image} alt={"Item image"} width="100%" />
+      <img src={image} alt="Item" width="100%" />
       <div className="item-brand">{brand}</div>
       <div className="item-name">{name}</div>
       <div className="item-info">

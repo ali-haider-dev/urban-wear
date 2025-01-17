@@ -20,7 +20,7 @@ function ItemDetail() {
       <Link to="/"> &#8592; Back</Link>
       <div className="item-detail">
         <div className="item-detail-image">
-          <img src={item.image} alt={"Item image"} />
+          <img src={item.image} alt="Item" />
         </div>
         <div className="item-detail-info">
           <div className="item-brand" style={{ margin: "0px 10px" }}>
