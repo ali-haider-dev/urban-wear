@@ -1,6 +1,6 @@
+import React from "react";
 
-
-export default AppReducer = (state, action)  => {
+const Reducer = (state, action) => {
   switch (action.type) {
     case "ADD_ITEM_IN_CART":
       return {
@@ -31,5 +31,6 @@ export default AppReducer = (state, action)  => {
       };
     default:
       return state;
-  }
+  };
 };
+export default Reducer
