@@ -14,7 +14,7 @@ function ItemDetail() {
   const [isAdded, setIsAdded] = useState(
     cart.findIndex((c) => c.id === itemId) > -1
   );
-
+console.log("1111",cart)
   return (
     <div className="item-detail-container">
       <Link to="/"> &#8592; Back</Link>
@@ -43,7 +43,7 @@ function ItemDetail() {
               setIsAdded(true);
             }}
           >
-            {isAdded ? <Link to="/cart">Go to Cart</Link> : "Add To bag"}
+            {isAdded ? "Added to cart": "Add To bag"}
           </button>
           <p className="item-description">
             Lorem Ipsum is simply dummy text of the printing and typesetting

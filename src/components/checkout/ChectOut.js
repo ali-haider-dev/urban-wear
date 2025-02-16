@@ -4,12 +4,21 @@ import { GlobalContext } from "../../context/GlobalState";
 import "./Checkout.css";
 
 const Checkout = () => {
-  const { cart, orders, addItemToOrderList, clearCart } =
+  const { cart, orders, addItemToOrderList, clearCart, updateCartItem } =
     useContext(GlobalContext);
   const { discount, extraFees, tax } = { discount: 20, extraFees: 99, tax: 5 };
-  const subTotal = Math.floor(cart?.reduce((sum, curr) => sum + curr.price, 0));
-  const total = Math.floor(subTotal + 99 + 5 - (subTotal + 99 + 5) * 0.2);
+
+  // Calculate subtotal based on item quantity
+  const subTotal = Math.floor(
+    cart?.reduce((sum, curr) => sum + curr.price * curr.quantity, 0)
+  );
+
+  const total = Math.floor(
+    subTotal + extraFees + tax - (subTotal + extraFees + tax) * (discount / 100)
+  );
+
   const [isOrdered, setIsOrdered] = useState(false);
+
   const handlePay = () => {
     addItemToOrderList({
       orderId: orders.length + 1,
@@ -23,6 +32,11 @@ const Checkout = () => {
     clearCart();
     setIsOrdered(true);
   };
+
+  const handleQuantityChange = (itemId, change) => {
+    updateCartItem(itemId, change); // Update the quantity in the cart
+  };
+
   return (
     <div className="checkout-container">
       {isOrdered ? (
@@ -34,11 +48,30 @@ const Checkout = () => {
           <div>
             <div className="custom-row">
               <h4>Order Review</h4>
-              <span>{cart?.length} items in cart</span>
+              <span>{cart?.length} unique items in cart</span>
             </div>
-            <div className="custom-row">
-              <h4>Coupons</h4>
-              <span>Not Available</span>
+            <div className="cart-items">
+              {cart.map((item) => (
+                <div key={item.id} className="cart-item">
+                  <img src={item.image} alt={item.name} className="cart-item-image" />
+                  <div className="cart-item-details">
+                    <h4>{item.name}</h4>
+                    <p>Price: ${item.price}</p>
+                    <div className="cart-item-quantity">
+                      <button
+                        onClick={() => handleQuantityChange(item.id, -1)}
+                        disabled={item.quantity <= 1}
+                      >
+                        -
+                      </button>
+                      <span>{item.quantity}</span>
+                      <button onClick={() => handleQuantityChange(item.id, 1)}>
+                        +
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
             <div className="custom-row">
               <h4>Checkout Summary</h4>

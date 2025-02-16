@@ -3,6 +3,7 @@ import { GlobalContext } from "../../context/GlobalState";
 
 function Orders() {
   const { orders } = useContext(GlobalContext);
+  console.log("Orderss>>>",orders)
   return (
     <div className="cart-list">
       {orders.map((order) => (
