@@ -6,7 +6,7 @@ import "./Checkout.css";
 const Checkout = () => {
   const { cart, orders, addItemToOrderList, clearCart, updateCartItem } =
     useContext(GlobalContext);
-  const { discount, extraFees, tax } = { discount: 20, extraFees: 99, tax: 5 };
+  const { discount, extraFees, tax } = { discount: 0, extraFees: 0, tax: 5 };
 
   // Calculate subtotal based on item quantity
   const subTotal = Math.floor(
@@ -20,6 +20,7 @@ const Checkout = () => {
   const [isOrdered, setIsOrdered] = useState(false);
 
   const handlePay = () => {
+    console.log("Order placed successfully",total);
     addItemToOrderList({
       orderId: orders.length + 1,
       buyerId: 1,

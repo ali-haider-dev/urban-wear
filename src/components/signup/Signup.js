@@ -1,18 +1,24 @@
-import { useFormik } from "formik"
-import * as Yup from "yup"
-import { Link } from "react-router-dom"
-import "./index.css"
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { Link } from "react-router-dom";
+import "./index.css";
+import { addDocument, signup } from "../../firebase";
 
 const SignupSchema = Yup.object().shape({
-  name: Yup.string().min(2, "Too Short!").max(50, "Too Long!").required("Required"),
+  name: Yup.string()
+    .min(2, "Too Short!")
+    .max(50, "Too Long!")
+    .required("Required"),
   email: Yup.string().email("Invalid email").required("Required"),
-  password: Yup.string().min(8, "Password must be at least 8 characters").required("Required"),
+  password: Yup.string()
+    .min(8, "Password must be at least 8 characters")
+    .required("Required"),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password")], "Passwords must match")
     .required("Required"),
-})
+});
 
-const Signup=()=> {
+const Signup = () => {
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -23,9 +29,14 @@ const Signup=()=> {
     validationSchema: SignupSchema,
     onSubmit: (values) => {
       // Handle form submission here
-      console.log(values)
+      console.log(values);
+      signup(values.email, values.password)
+        .then((user) => {
+            addDocument({ name: values.name, email: values.email, userId: user.uid });
+        })
+        .catch((error) => {});
     },
-  })
+  });
 
   return (
     <div className="auth-container">
@@ -42,7 +53,9 @@ const Signup=()=> {
               onBlur={formik.handleBlur}
               value={formik.values.name}
             />
-            {formik.touched.name && formik.errors.name ? <div className="error">{formik.errors.name}</div> : null}
+            {formik.touched.name && formik.errors.name ? (
+              <div className="error">{formik.errors.name}</div>
+            ) : null}
           </div>
           <div className="form-group">
             <label htmlFor="email">Email address</label>
@@ -54,7 +67,9 @@ const Signup=()=> {
               onBlur={formik.handleBlur}
               value={formik.values.email}
             />
-            {formik.touched.email && formik.errors.email ? <div className="error">{formik.errors.email}</div> : null}
+            {formik.touched.email && formik.errors.email ? (
+              <div className="error">{formik.errors.email}</div>
+            ) : null}
           </div>
           <div className="form-group">
             <label htmlFor="password">Password</label>
@@ -93,8 +108,7 @@ const Signup=()=> {
         </p>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Signup
-
+export default Signup;

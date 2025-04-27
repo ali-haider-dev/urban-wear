@@ -1,33 +1,74 @@
 import "./App.css";
-import HomePage from "./components/home/Home";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { auth } from "./firebase";
 import Navbar from "./components/navbar/Navbar";
 
+// User Pages
+import HomePage from "./components/home/Home";
 import Orders from "./components/orders/Orders";
 import Checkout from "./components/checkout/ChectOut";
 import Cart from "./components/cart/Cart";
 import ItemDetail from "./components/itemDetail/ItemDetail";
+
+// Auth Pages
 import Login from "./components/login/Login";
 import Signup from "./components/signup/Signup";
 
+// Admin Pages
+import AdminDashboard from "./components/admin/AdminDashboard";
+// import ManageUsers from "./components/admin/ManageUsers";
+
 function App() {
+  const location = useLocation();
+  const [userEmail, setUserEmail] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUserEmail(user?.email || null);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const isAdmin = userEmail === "admin@gmail.com";
+  const isLoggedIn = !!userEmail;
+
+  // Hide Navbar on login/signup pages
+  const hideNavbarRoutes = ["/login", "/signup"];
+  const showNavbar = isLoggedIn && !hideNavbarRoutes.includes(location.pathname.toLowerCase());
+
+  if (loading) return <div>Loading...</div>;
+
   return (
     <div className="App">
-      <BrowserRouter>
-        <div>
-          <Navbar />
-        </div>
-        <Routes>
-          <Route path="/item/:id" element={<ItemDetail />} />
-          <Route path="/cart" element={<Cart/>} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route exact path="/Home" element={<HomePage />} />
-          <Route exact path="Login" element={<Login />} />
-          <Route exact path="Signup" element={<Signup />} />
-          <Route exact path="/" element={<Login />} />
-        </Routes>
-      </BrowserRouter>
+      {showNavbar && <Navbar />}
+
+      <Routes>
+        {!isLoggedIn ? (
+          <>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </>
+        ) : isAdmin ? (
+          <>
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            {/* <Route path="/admin/manage-users" element={<ManageUsers />} /> */}
+            <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+          </>
+        ) : (
+          <>
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/item/:id" element={<ItemDetail />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/orders" element={<Orders />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="*" element={<Navigate to="/home" replace />} />
+          </>
+        )}
+      </Routes>
     </div>
   );
 }

@@ -1,14 +1,15 @@
-import { useFormik } from "formik"
-import * as Yup from "yup"
-import { Link } from "react-router-dom"
-import "./index.css"
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { Link } from "react-router-dom";
+import "./index.css";
+import { login } from "../../firebase";
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
   password: Yup.string().required("Required"),
-})
+});
 
-const Login=()=> {
+const Login = () => {
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -17,9 +18,14 @@ const Login=()=> {
     validationSchema: LoginSchema,
     onSubmit: (values) => {
       // Handle form submission here
-      console.log(values)
+      console.log(values);
+      login(values.email, values.password)
+        .then((user) => {})
+        .catch((error) => {
+          alert(error.message);
+        });
     },
-  })
+  });
 
   return (
     <div className="auth-container">
@@ -36,7 +42,9 @@ const Login=()=> {
               onBlur={formik.handleBlur}
               value={formik.values.email}
             />
-            {formik.touched.email && formik.errors.email ? <div className="error">{formik.errors.email}</div> : null}
+            {formik.touched.email && formik.errors.email ? (
+              <div className="error">{formik.errors.email}</div>
+            ) : null}
           </div>
           <div className="form-group">
             <label htmlFor="password">Password</label>
@@ -52,8 +60,8 @@ const Login=()=> {
               <div className="error">{formik.errors.password}</div>
             ) : null}
           </div>
-          <button type="submit" className="submit-btn">
-            Log in
+          <button className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-60 transition transform hover:scale-105">
+           Login
           </button>
         </form>
         <p className="auth-link">
@@ -61,8 +69,7 @@ const Login=()=> {
         </p>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Login
-
+export default Login;
