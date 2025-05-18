@@ -11,93 +11,92 @@ import { Upload, X } from "lucide-react"
 export default function AddProductPage({ onAddProduct, editingProduct }) {
   const [product, setProduct] = useState({
     name: "",
-    description: "",
+    brand: "",
+    saleDiscount: 0,
     price: 0,
-    image: "https://via.placeholder.com/200",
     stock: 0,
-    status: "active",
+    description: "",
+    status: "Active",
+    images: [],
   })
 
-  const [imagePreview, setImagePreview] = useState(null)
-  const [isImageChanged, setIsImageChanged] = useState(false)
+  const [imagePreviews, setImagePreviews] = useState([])
   const fileInputRef = useRef(null)
 
   useEffect(() => {
     if (editingProduct) {
       setProduct(editingProduct)
-      setImagePreview(editingProduct.image)
-      setIsImageChanged(false)
+      setImagePreviews(editingProduct.images || [])
     } else {
-      setProduct({
-        name: "",
-        description: "",
-        price: 0,
-        image: "https://via.placeholder.com/200",
-        stock: 0,
-        status: "active",
-      })
-      setImagePreview(null)
-      setIsImageChanged(false)
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ""
-      }
+      resetForm()
     }
   }, [editingProduct])
 
+  const resetForm = () => {
+    setProduct({
+      name: "",
+      brand: "",
+      saleDiscount: 0,
+      price: 0,
+      stock: 0,
+      description: "",
+      status: "Active",
+      images: [],
+    })
+    setImagePreviews([])
+    if (fileInputRef.current) fileInputRef.current.value = ""
+  }
+
   const handleChange = (e) => {
     const { name, value } = e.target
-    setProduct({ ...product, [name]: name === "price" || name === "stock" ? Number.parseFloat(value) : value })
+    const parsedValue =
+      name === "price" || name === "stock" || name === "saleDiscount"
+        ? parseFloat(value)
+        : value
+    setProduct({ ...product, [name]: parsedValue })
   }
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
+    const files = Array.from(e.target.files)
+    const newPreviews = []
+
+    files.forEach((file) => {
       const reader = new FileReader()
       reader.onloadend = () => {
-        setImagePreview(reader.result)
-        setProduct({ ...product, image: reader.result })
-        setIsImageChanged(true)
+        newPreviews.push(reader.result)
+        if (newPreviews.length === files.length) {
+          setImagePreviews((prev) => [...prev, ...newPreviews])
+          setProduct((prev) => ({
+            ...prev,
+            images: [...prev.images, ...newPreviews],
+          }))
+        }
       }
       reader.readAsDataURL(file)
-    }
+    })
   }
 
-  const handleRemoveImage = () => {
-    setImagePreview(null)
-    setProduct({ ...product, image: "https://via.placeholder.com/200" })
-    setIsImageChanged(true)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""
-    }
+  const handleRemoveImage = (index) => {
+    const updatedPreviews = imagePreviews.filter((_, i) => i !== index)
+    setImagePreviews(updatedPreviews)
+    setProduct({ ...product, images: updatedPreviews })
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
     onAddProduct(product)
-    if (!editingProduct) {
-      setProduct({
-        name: "",
-        description: "",
-        price: 0,
-        image: "https://via.placeholder.com/200",
-        stock: 0,
-        status: "active",
-      })
-      setImagePreview(null)
-      setIsImageChanged(false)
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ""
-      }
-    }
+    if (!editingProduct) resetForm()
   }
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">{editingProduct ? "Edit Product" : "Add New Product"}</h1>
+      <h1 className="text-2xl font-bold mb-6">
+        {editingProduct ? "Edit Product" : "Add New Product"}
+      </h1>
 
       <Card>
         <CardHeader>
-          <CardTitle>{editingProduct ? "Update Product Details" : "Product Information"}</CardTitle>
+          <CardTitle>{editingProduct ? "Update Product" : "Product Information"}</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -105,6 +104,22 @@ export default function AddProductPage({ onAddProduct, editingProduct }) {
               <div className="space-y-2">
                 <Label htmlFor="name">Product Name</Label>
                 <Input id="name" name="name" value={product.name} onChange={handleChange} required />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="brand">Brand</Label>
+                <Input id="brand" name="brand" value={product.brand} onChange={handleChange} required />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="saleDiscount">Sale Discount (%)</Label>
+                <Input
+                  id="saleDiscount"
+                  name="saleDiscount"
+                  type="number"
+                  value={product.saleDiscount}
+                  onChange={handleChange}
+                />
               </div>
 
               <div className="space-y-2">
@@ -118,6 +133,33 @@ export default function AddProductPage({ onAddProduct, editingProduct }) {
                   onChange={handleChange}
                   required
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="stock">Stock Quantity</Label>
+                <Input
+                  id="stock"
+                  name="stock"
+                  type="number"
+                  value={product.stock}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="status">Status</Label>
+                <select
+                  id="status"
+                  name="status"
+                  value={product.status}
+                  onChange={handleChange}
+                  className="border rounded-md px-3 py-2 w-full"
+                  required
+                >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
               </div>
             </div>
 
@@ -133,97 +175,51 @@ export default function AddProductPage({ onAddProduct, editingProduct }) {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="image">Product Image</Label>
-                <div className="flex flex-col gap-4">
-                  <div className="flex flex-col gap-2">
-                    <div className="border rounded-md p-4 bg-gray-50">
-                      {imagePreview ? (
-                        <div className="relative">
-                          <img
-                            src={imagePreview || "/placeholder.svg"}
-                            alt="Product preview"
-                            className="w-full max-h-[200px] object-contain rounded-md"
-                          />
-                          <button
-                            type="button"
-                            onClick={handleRemoveImage}
-                            className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100"
-                            title="Remove image"
-                          >
-                            <X size={16} />
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="flex flex-col items-center justify-center py-6 text-gray-500">
-                          <Upload size={40} className="mb-2" />
-                          <p className="text-sm">No image selected</p>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <label
-                        htmlFor="image-upload"
-                        className="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-md text-sm flex items-center gap-2"
-                      >
-                        <Upload size={16} />
-                        {imagePreview ? "Change Image" : "Upload Image"}
-                        <input
-                          id="image-upload"
-                          name="image"
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageChange}
-                          ref={fileInputRef}
-                          className="hidden"
-                        />
-                      </label>
-                      {editingProduct && isImageChanged && (
-                        <span className="text-xs text-amber-600">Image has been changed</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="stock">Stock Quantity</Label>
-                <Input id="stock" name="stock" type="number" value={product.stock} onChange={handleChange} required />
-              </div>
-            </div>
-
             <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <div className="flex items-center space-x-4">
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    name="status"
-                    value="active"
-                    checked={product.status === "active"}
-                    onChange={handleChange}
-                    className="h-4 w-4"
-                  />
-                  <span>Active (Live)</span>
-                </label>
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    name="status"
-                    value="hidden"
-                    checked={product.status === "hidden"}
-                    onChange={handleChange}
-                    className="h-4 w-4"
-                  />
-                  <span>Hidden</span>
-                </label>
+              <Label htmlFor="images">Product Images</Label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {imagePreviews.map((src, index) => (
+                  <div key={index} className="relative border rounded-md overflow-hidden">
+                    <img
+                      src={src}
+                      alt={`Product preview ${index + 1}`}
+                      className="w-full h-40 object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveImage(index)}
+                      className="absolute top-2 right-2 bg-white rounded-full p-1 shadow hover:bg-gray-100"
+                      title="Remove image"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ))}
               </div>
+
+              <label
+                htmlFor="image-upload"
+                className="inline-flex items-center gap-2 cursor-pointer mt-2 bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-md text-sm"
+              >
+                <Upload size={16} />
+                Upload Images
+                <input
+                  id="image-upload"
+                  name="images"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageChange}
+                  ref={fileInputRef}
+                  className="hidden"
+                />
+              </label>
             </div>
 
-            <div className="flex justify-end">
-              <Button type="submit">{editingProduct ? "Update Product" : "Add Product"}</Button>
+            <div className="flex justify-end pt-4">
+              <Button type="submit">
+                {editingProduct ? "Update Product" : "Add Product"}
+              </Button>
             </div>
           </form>
         </CardContent>

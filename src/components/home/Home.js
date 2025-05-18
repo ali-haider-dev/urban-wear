@@ -9,19 +9,32 @@ function Item({ name, rating, price, saleDiscount, image, brand }) {
   const discountedPrice = saleDiscount ? price - (price * saleDiscount) / 100 : price;
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer max-w-xs mx-auto">
+    <div className="relative bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 cursor-pointer max-w-xs mx-auto">
+      {/* Discount Badge */}
+      {saleDiscount && (
+        <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-md z-10">
+          {saleDiscount}% OFF
+        </div>
+      )}
+
+      {/* Product Image */}
       <img
         src={image || "/placeholder.svg"}
         alt={name}
-        className="w-full h-48 object-cover"
+        className="w-full h-52 object-cover rounded-t-2xl"
       />
+
+      {/* Product Info */}
       <div className="p-4">
+        {/* Name & Brand */}
         <h3 className="text-lg font-semibold text-gray-900 truncate" title={name}>
           {name}
         </h3>
         <p className="text-sm text-gray-500 mb-2 truncate" title={brand}>
-          {brand}
+          by {brand}
         </p>
+
+        {/* Rating */}
         <div className="flex items-center mb-3">
           {[...Array(5)].map((_, i) => (
             <Star
@@ -34,6 +47,8 @@ function Item({ name, rating, price, saleDiscount, image, brand }) {
           ))}
           <span className="text-sm text-gray-600 ml-2">({rating.toFixed(1)})</span>
         </div>
+
+        {/* Price Section */}
         <div className="flex items-baseline space-x-2">
           <span className="text-xl font-bold text-gray-900">
             ${discountedPrice.toFixed(2)}

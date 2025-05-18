@@ -1,73 +1,103 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Sidebar from "../admin/SideBar"
-import ProductsPage from "../pages/ProductsPage"
-import AddProductPage from "../pages/AddProductPage"
-import MessagesPage from "../pages/MessagesPage"
-import OrdersPage from "../pages/OredersPage"
-import { useNavigate } from 'react-router-dom';
-import items from "../../mockData/items.json"
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
+import Sidebar from "../admin/SideBar";
+import AdminNavbar from "../admin/AdminNavbar";
+
+import ProductsPage from "../pages/ProductsPage";
+import AddProductPage from "../pages/AddProductPage";
+import MessagesPage from "../pages/MessagesPage";
+import OrdersPage from "../pages/OredersPage";
+
+import items from "../../mockData/items.json";
 
 export default function AdminDashboard() {
-  const [activePage, setActivePage] = useState("products")
+  const [activePage, setActivePage] = useState("products");
+  const [products, setProducts] = useState(items);
+  const [editingProduct, setEditingProduct] = useState(null);
   const navigate = useNavigate();
-  const [products, setProducts] = useState(items)
-  const [editingProduct, setEditingProduct] = useState(null)
 
   const handleAddProduct = (product) => {
     if (editingProduct) {
-      // Update existing product
-      setProducts(products.map((p) => (p.id === product.id ? product : p)))
-      setEditingProduct(null)
-      navigate("/admin/products")
+      setProducts(products.map((p) => (p.id === product.id ? product : p)));
+      setEditingProduct(null);
     } else {
-      // Add new product
-      setProducts([...products, { ...product, id: Date.now().toString() }])
-      navigate("/admin/products")
+      setProducts([...products, { ...product, id: Date.now().toString() }]);
     }
-  }
+    setActivePage("products");
+    navigate("/admin/dashboard");
+  };
 
   const handleEditProduct = (product) => {
-    setEditingProduct(product)
-    setActivePage("add-product")
-  }
+    setEditingProduct(product);
+    setActivePage("add-product");
+  };
 
   const handleToggleProductStatus = (productId) => {
     setProducts(
       products.map((product) =>
-        product.id === productId ? { ...product, status: product.status === "active" ? "hidden" : "active" } : product,
-      ),
-    )
-  }
+        product.id === productId
+          ? { ...product, status: product.status === "active" ? "hidden" : "active" }
+          : product
+      )
+    );
+  };
 
   const renderPage = () => {
     switch (activePage) {
       case "products":
         return (
-          <ProductsPage products={products} onEdit={handleEditProduct} onToggleStatus={handleToggleProductStatus} />
-        )
+          <ProductsPage
+            products={products}
+            onEdit={handleEditProduct}
+            onToggleStatus={handleToggleProductStatus}
+          />
+        );
       case "add-product":
-        return <AddProductPage onAddProduct={handleAddProduct} editingProduct={editingProduct} />
+        return (
+          <AddProductPage
+            onAddProduct={handleAddProduct}
+            editingProduct={editingProduct}
+          />
+        );
       case "messages":
-        return <MessagesPage />
+        return <MessagesPage />;
       case "orders":
-        return <OrdersPage products={products} onEdit={handleEditProduct} onToggleStatus={handleToggleProductStatus} />
+        return (
+          <OrdersPage
+            products={products}
+            onEdit={handleEditProduct}
+            onToggleStatus={handleToggleProductStatus}
+          />
+        );
       default:
         return (
-          <ProductsPage products={products} onEdit={handleEditProduct} onToggleStatus={handleToggleProductStatus} />
-        )
+          <ProductsPage
+            products={products}
+            onEdit={handleEditProduct}
+            onToggleStatus={handleToggleProductStatus}
+          />
+        );
     }
-  }
+  };
 
   return (
     <div className="flex h-screen bg-gray-100">
-      
+      {/* Sidebar */}
       <Sidebar activePage={activePage} setActivePage={setActivePage} />
-      <div className="flex-1 overflow-auto">
-        <main className="p-6">{renderPage()}</main>
+
+      {/* Content Area */}
+      <div className="flex-1 flex flex-col">
+        {/* Admin Top Navbar */}
+        <AdminNavbar />
+
+        {/* Main Page Content */}
+        <main className="flex-1 overflow-y-auto p-6 bg-gray-50">
+          {renderPage()}
+        </main>
       </div>
     </div>
-  )
+  );
 }

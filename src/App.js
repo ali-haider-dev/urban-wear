@@ -32,11 +32,11 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  const isAdmin = userEmail === "admin@gmail.com";
+  const isAdmin = userEmail === "admin1@gmail.com";
   const isLoggedIn = !!userEmail;
 
   // Hide Navbar on login/signup pages
-  const hideNavbarRoutes = ["/login", "/signup"];
+  const hideNavbarRoutes = ["/login", "/signup","/admin/dashboard"];
   const showNavbar = isLoggedIn && !hideNavbarRoutes.includes(location.pathname.toLowerCase());
 
   if (loading) return <div>Loading...</div>;
