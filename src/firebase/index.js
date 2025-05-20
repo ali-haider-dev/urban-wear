@@ -4,7 +4,6 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { getAnalytics } from "firebase/analytics";
 import {
   addDoc,
   collection,

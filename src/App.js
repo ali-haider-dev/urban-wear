@@ -17,6 +17,9 @@ import Signup from "./components/signup/Signup";
 
 // Admin Pages
 import AdminDashboard from "./components/admin/AdminDashboard";
+import ForgotPassword from "./components/ForgotPassword/ForgotPassword";
+import ResetPassword from "./components/ForgotPassword/ResetPassword";
+import VerifyOtp from "./components/ForgotPassword/VerifyOtp";
 // import ManageUsers from "./components/admin/ManageUsers";
 
 function App() {
@@ -50,6 +53,10 @@ function App() {
           <>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/verify-otp" element={<VerifyOtp />} />
+            {/* <Route path="/admin/dashboard" element={<AdminDashboard />} /> */}
             <Route path="*" element={<Navigate to="/login" replace />} />
           </>
         ) : isAdmin ? (

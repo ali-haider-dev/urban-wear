@@ -3,41 +3,69 @@ import * as Yup from "yup";
 import { Link } from "react-router-dom";
 import "./index.css";
 import { addDocument, signup } from "../../firebase";
-
+import { useState } from "react";
+import { Post } from "../../Api";
+import { useNavigate } from "react-router-dom";
 const SignupSchema = Yup.object().shape({
   name: Yup.string()
     .min(2, "Too Short!")
     .max(50, "Too Long!")
-    .required("Required"),
-  email: Yup.string().email("Invalid email").required("Required"),
+    .required("Name field is required"),
+  email: Yup.string()
+    .email("Invalid email")
+    .required("Email field is Required"),
   password: Yup.string()
     .min(8, "Password must be at least 8 characters")
-    .required("Required"),
-  confirmPassword: Yup.string()
-    .oneOf([Yup.ref("password")], "Passwords must match")
-    .required("Required"),
+    .matches(/[A-Z]/, "Passwords must have at least one uppercase ('A'-'Z').")
+    .matches(/\d/, "Passwords must have at least one digit ('0'-'9').")
+    .matches(
+      /[^a-zA-Z0-9]/,
+      "Passwords must have at least one non alphanumeric character."
+    )
+    .required("password field is required"),
 });
 
 const Signup = () => {
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const formik = useFormik({
     initialValues: {
       name: "",
       email: "",
       password: "",
-      confirmPassword: "",
     },
     validationSchema: SignupSchema,
     onSubmit: (values) => {
       // Handle form submission here
       console.log(values);
-      signup(values.email, values.password)
-        .then((user) => {
-            addDocument({ name: values.name, email: values.email, userId: user.uid });
-        })
-        .catch((error) => {});
+      const handlePress = async () => {
+        setLoading(true);
+        const data = {
+          fullName: values.name,
+          email: values.email,
+          password: values.password,
+          role: 1,
+        };
+        const response = await Post({
+          url: "/auth/signUp",
+          data: data,
+          setErrors: (errors) => {
+            formik.setErrors(errors);
+          },
+          showError: false,
+        });
+
+        if (response.success) {
+          setLoading(true);
+          navigate("/login");
+        } else {
+          console.log("Signup failed:", response.error);
+          setLoading(true);
+        }
+      };
+      handlePress();
     },
   });
-
   return (
     <div className="auth-container">
       <div className="auth-form">
@@ -85,7 +113,7 @@ const Signup = () => {
               <div className="error">{formik.errors.password}</div>
             ) : null}
           </div>
-          <div className="form-group">
+          {/* <div className="form-group">
             <label htmlFor="confirmPassword">Confirm Password</label>
             <input
               id="confirmPassword"
@@ -98,7 +126,7 @@ const Signup = () => {
             {formik.touched.confirmPassword && formik.errors.confirmPassword ? (
               <div className="error">{formik.errors.confirmPassword}</div>
             ) : null}
-          </div>
+          </div> */}
           <button type="submit" className="submit-btn">
             Sign up
           </button>

@@ -1,29 +1,53 @@
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./index.css";
 import { login } from "../../firebase";
+import { Post } from "../../Api";
+import { useState } from "react";
 
 const LoginSchema = Yup.object().shape({
-  email: Yup.string().email("Invalid email").required("Required"),
+  userName: Yup.string().required("Required"),
   password: Yup.string().required("Required"),
 });
 
 const Login = () => {
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const formik = useFormik({
     initialValues: {
-      email: "",
+      userName: "",
       password: "",
     },
     validationSchema: LoginSchema,
     onSubmit: (values) => {
       // Handle form submission here
       console.log(values);
-      login(values.email, values.password)
-        .then((user) => {})
-        .catch((error) => {
-          alert(error.message);
+      const handlePress = async () => {
+        setLoading(true);
+        const data = {
+          email: values.userName,
+          password: values.password,
+        };
+        const response = await Post({
+          url: "/auth/login",
+          data: data,
+          setErrors: (errors) => {
+            formik.setErrors(errors);
+          },
+          showError: false,
         });
+
+        if (response.success) {
+          setLoading(true);
+          console.log("Login successful", response.data);
+          // navigate("/login");
+        } else {
+          console.log("Login failed:", response.error);
+          setLoading(true);
+        }
+      };
+      handlePress();
     },
   });
 
@@ -33,17 +57,17 @@ const Login = () => {
         <h2>Log in</h2>
         <form onSubmit={formik.handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email">Email address</label>
+            <label htmlFor="userName">Email address</label>
             <input
-              id="email"
-              name="email"
-              type="email"
+              id="userName"
+              name="userName"
+              type="text"
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              value={formik.values.email}
+              value={formik.values.userName}
             />
-            {formik.touched.email && formik.errors.email ? (
-              <div className="error">{formik.errors.email}</div>
+            {formik.touched.userName && formik.errors.userName ? (
+              <div className="error">{formik.errors.userName}</div>
             ) : null}
           </div>
           <div className="form-group">
@@ -60,8 +84,11 @@ const Login = () => {
               <div className="error">{formik.errors.password}</div>
             ) : null}
           </div>
-          <button className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-60 transition transform hover:scale-105">
-           Login
+          <p className="auth-link text-left my-2">
+            Forgot your password? <Link to="/forgot-password">Reset</Link>
+          </p>
+          <button className="bg-blue-600 w-full text-white px-[15px] py-3 rounded-lg font-semibold hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-60 transition transform hover:scale-105">
+            Login
           </button>
         </form>
         <p className="auth-link">
