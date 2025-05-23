@@ -5,13 +5,14 @@ import "./index.css";
 import { login } from "../../firebase";
 import { Post } from "../../Api";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 const LoginSchema = Yup.object().shape({
   userName: Yup.string().required("Required"),
   password: Yup.string().required("Required"),
 });
 
-const Login = () => {
+const Login = ({ setUser }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -42,10 +43,14 @@ const Login = () => {
         if (response.success) {
           setLoading(true);
           console.log("Login successful", response.data);
-          navigate("/admin/dashboard")
+          await localStorage.setItem("token", response.data.bearerToken);
+          await localStorage.setItem("user", JSON.stringify(response.data));
+          setUser(response.data);
+          // navigate("/admin/dashboard")
           // navigate("/login");
         } else {
           console.log("Login failed:", response.error);
+          toast.error(`Login failed:${response.error}`);
           setLoading(true);
         }
       };

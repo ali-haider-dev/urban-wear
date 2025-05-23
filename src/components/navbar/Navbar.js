@@ -1,20 +1,17 @@
 import React, { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { GlobalContext } from "../../context/GlobalState";
 import { auth } from "../../firebase";
 import { signOut } from "firebase/auth";
 
-const Navbar = () => {
+const Navbar = ({setUser}) => {
   const { cart } = useContext(GlobalContext);
-
-  const signOutHandler = () => {
-    signOut(auth)
-      .then(() => {
-        console.log('User signed out');
-      })
-      .catch((error) => {
-        console.error('Error signing out:', error.message);
-      });
+  const navigate  = useNavigate()
+  const signOutHandler = async() => {
+    await localStorage.removeItem('user')
+    await localStorage.removeItem('token')
+    setUser(null)
+    navigate("/login")
   };
 
   return (
