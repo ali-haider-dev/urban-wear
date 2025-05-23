@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { auth } from "./firebase";
 import Navbar from "./components/navbar/Navbar";
-
+import { Toaster } from 'react-hot-toast';
 // User Pages
 import HomePage from "./components/home/Home";
 import Orders from "./components/orders/Orders";
@@ -35,8 +35,8 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  const isAdmin = userEmail === "admin1@gmail.com";
-  const isLoggedIn = !!userEmail;
+  const isAdmin = true; // Replace with actual admin check logic
+  const isLoggedIn = true; // Replace with actual login check logic
 
   // Hide Navbar on login/signup pages
   const hideNavbarRoutes = ["/login", "/signup","/admin/dashboard"];
@@ -46,6 +46,7 @@ function App() {
 
   return (
     <div className="App">
+       <Toaster position="top-right" />
       {showNavbar && <Navbar />}
 
       <Routes>

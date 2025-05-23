@@ -1,92 +1,156 @@
-"use client"
+import { useState, useEffect, useRef } from "react";
+import { Button } from "../ui/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card";
+import { Input } from "../ui/Input";
+import { Label } from "../ui/Label";
+import { Textarea } from "../ui/Textarea";
+import { Upload, X } from "lucide-react";
+import toast from "react-hot-toast";
+import { Post } from "../../Api";
 
-import { useState, useEffect, useRef } from "react"
-import { Button } from "../ui/Button"
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card"
-import { Input } from "../ui/Input"
-import { Label } from "../ui/Label"
-import { Textarea } from "../ui/Textarea"
-import { Upload, X } from "lucide-react"
-
-export default function AddProductPage({ onAddProduct, editingProduct }) {
+export default function AddProductPage({ editingProduct }) {
+  const [loading, setLoading] = useState(false);
+  const [nameError, setNameError] = useState(null);
+  const [brandError, setBrandError] = useState(null);
+  const [categoryError, setCategoryError] = useState(null);
+  const [saleDiscountError, setSaleDiscountError] = useState(null);
+  const [priceError, setPriceError] = useState(null);
+  const [stockError, setStockError] = useState(null);
+  const [descriptionError, setDescriptionError] = useState(null);
+  const [imagesError, setImagesError] = useState(null);
   const [product, setProduct] = useState({
     name: "",
     brand: "",
+    category: "",
     saleDiscount: 0,
     price: 0,
     stock: 0,
     description: "",
     status: "Active",
     images: [],
-  })
+  });
 
-  const [imagePreviews, setImagePreviews] = useState([])
-  const fileInputRef = useRef(null)
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (editingProduct) {
-      setProduct(editingProduct)
-      setImagePreviews(editingProduct.images || [])
+      setProduct({
+        ...editingProduct,
+        images: [],
+      });
+      setImagePreviews(editingProduct.images || []);
     } else {
-      resetForm()
+      resetForm();
     }
-  }, [editingProduct])
+  }, [editingProduct]);
 
   const resetForm = () => {
     setProduct({
       name: "",
       brand: "",
+      category: "",
       saleDiscount: 0,
       price: 0,
       stock: 0,
       description: "",
       status: "Active",
       images: [],
-    })
-    setImagePreviews([])
-    if (fileInputRef.current) fileInputRef.current.value = ""
-  }
+    });
+    setImagePreviews([]);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    setNameError(null);
+    setBrandError(null);
+    setCategoryError(null);
+    setSaleDiscountError(null);
+    setPriceError(null);
+    setStockError(null);
+    setDescriptionError(null);
+    setImagesError(null);
+  };
 
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     const parsedValue =
-      name === "price" || name === "stock" || name === "saleDiscount"
+      ["price", "stock", "saleDiscount"].includes(name) && value !== ""
         ? parseFloat(value)
-        : value
-    setProduct({ ...product, [name]: parsedValue })
-  }
+        : value;
+    setProduct((prev) => ({ ...prev, [name]: parsedValue }));
+  };
 
   const handleImageChange = (e) => {
-    const files = Array.from(e.target.files)
-    const newPreviews = []
-
-    files.forEach((file) => {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        newPreviews.push(reader.result)
-        if (newPreviews.length === files.length) {
-          setImagePreviews((prev) => [...prev, ...newPreviews])
-          setProduct((prev) => ({
-            ...prev,
-            images: [...prev.images, ...newPreviews],
-          }))
-        }
-      }
-      reader.readAsDataURL(file)
-    })
-  }
+    const files = Array.from(e.target.files);
+    const newPreviews = files.map((file) => URL.createObjectURL(file));
+    setImagePreviews((prev) => [...prev, ...newPreviews]);
+    setProduct((prev) => ({
+      ...prev,
+      images: [...prev.images, ...files],
+    }));
+  };
 
   const handleRemoveImage = (index) => {
-    const updatedPreviews = imagePreviews.filter((_, i) => i !== index)
-    setImagePreviews(updatedPreviews)
-    setProduct({ ...product, images: updatedPreviews })
-  }
+    const updatedPreviews = imagePreviews.filter((_, i) => i !== index);
+    setImagePreviews(updatedPreviews);
+    setProduct((prev) => {
+      const updatedImages = prev.images.filter((_, i) => i !== index);
+      return { ...prev, images: updatedImages };
+    });
+  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    onAddProduct(product)
-    if (!editingProduct) resetForm()
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setNameError(null);
+    setBrandError(null);
+    setCategoryError(null);
+    setSaleDiscountError(null);
+    setPriceError(null);
+    setStockError(null);
+    setDescriptionError(null);
+    setImagesError(null);
+    const formData = new FormData();
+    formData.append("Name", product.name);
+    formData.append("SKU", "123");
+    formData.append("Description", product.description);
+    formData.append("Cost", "123");
+    formData.append("Price", product.price.toString());
+    formData.append("StockInHand", product.stock.toString());
+    formData.append("DiscountPerc", product.saleDiscount.toString());
+    formData.append("Category", product.category);
+    formData.append("Brand", product.brand);
+
+    product.images.forEach((file) => {
+      if (file instanceof File) {
+        formData.append("Images", file);
+      }
+    });
+
+    const response = await Post({
+      url: "/product",
+      data: formData,
+      setErrors: (errors) => {
+        setNameError(errors?.Name || null);
+        setBrandError(errors?.Brand || null);
+        setCategoryError(errors?.Category || null);
+        setSaleDiscountError(errors?.DiscountPerc || null);
+        setPriceError(errors?.Price || null);
+        setStockError(errors?.StockInHand || null);
+        setDescriptionError(errors?.Description || null);
+        setImagesError(errors?.images || null);
+      },
+      showError: true,
+    });
+
+    if (response?.success) {
+      toast.success("Product uploaded successfully");
+      resetForm();
+    } else {
+      toast.error(`upload failed ${response?.error}`);
+      console.error("Upload failed:", response?.error);
+    }
+
+    setLoading(false);
+  };
 
   return (
     <div>
@@ -96,47 +160,71 @@ export default function AddProductPage({ onAddProduct, editingProduct }) {
 
       <Card>
         <CardHeader>
-          <CardTitle>{editingProduct ? "Update Product" : "Product Information"}</CardTitle>
+          <CardTitle>
+            {editingProduct ? "Update Product" : "Product Information"}
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Product Name</Label>
-                <Input id="name" name="name" value={product.name} onChange={handleChange} required />
+              <div className="space-y-1.5">
+                <Label htmlFor="name">name</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  type="text"
+                  value={product.name}
+                  onChange={handleChange}
+                  required
+                />
+                {nameError && (
+                  <p className="text-red-600 text-sm">{nameError}</p>
+                )}
               </div>
-
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <Label htmlFor="brand">Brand</Label>
-                <Input id="brand" name="brand" value={product.brand} onChange={handleChange} required />
+                <Input
+                  id="brand"
+                  name="brand"
+                  type="text"
+                  value={product.brand}
+                  onChange={handleChange}
+                  required
+                />
+                {brandError && (
+                  <p className="text-red-600 text-sm">{brandError}</p>
+                )}
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="saleDiscount">Sale Discount (%)</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="saleDiscount">Sale Discount</Label>
                 <Input
                   id="saleDiscount"
                   name="saleDiscount"
                   type="number"
                   value={product.saleDiscount}
                   onChange={handleChange}
+                  required
                 />
+                {saleDiscountError && (
+                  <p className="text-red-600 text-sm">{saleDiscountError}</p>
+                )}
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="price">Price ($)</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="price">price</Label>
                 <Input
                   id="price"
                   name="price"
                   type="number"
-                  step="0.01"
                   value={product.price}
                   onChange={handleChange}
                   required
                 />
+                {priceError && (
+                  <p className="text-red-600 text-sm">{priceError}</p>
+                )}
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="stock">Stock Quantity</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="stock">Stock</Label>
                 <Input
                   id="stock"
                   name="stock"
@@ -145,25 +233,27 @@ export default function AddProductPage({ onAddProduct, editingProduct }) {
                   onChange={handleChange}
                   required
                 />
+                {stockError && (
+                  <p className="text-red-600 text-sm">{stockError}</p>
+                )}
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
-                <select
-                  id="status"
-                  name="status"
-                  value={product.status}
+              <div className="space-y-1.5">
+                <Label htmlFor="category">category</Label>
+                <Input
+                  id="category"
+                  name="category"
+                  type="text"
+                  value={product.category}
                   onChange={handleChange}
-                  className="border rounded-md px-3 py-2 w-full"
                   required
-                >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                </select>
+                />
+                {categoryError && (
+                  <p className="text-red-600 text-sm">{categoryError}</p>
+                )}
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"
@@ -173,13 +263,19 @@ export default function AddProductPage({ onAddProduct, editingProduct }) {
                 rows={3}
                 required
               />
+              {descriptionError && (
+                <p className="text-red-600 text-sm">{descriptionError}</p>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="images">Product Images</Label>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {imagePreviews.map((src, index) => (
-                  <div key={index} className="relative border rounded-md overflow-hidden">
+                  <div
+                    key={index}
+                    className="relative border rounded-md overflow-hidden"
+                  >
                     <img
                       src={src}
                       alt={`Product preview ${index + 1}`}
@@ -214,16 +310,23 @@ export default function AddProductPage({ onAddProduct, editingProduct }) {
                   className="hidden"
                 />
               </label>
+              {imagesError && (
+                <p className="text-red-600 text-sm">{imagesError}</p>
+              )}
             </div>
 
             <div className="flex justify-end pt-4">
-              <Button type="submit">
-                {editingProduct ? "Update Product" : "Add Product"}
+              <Button type="submit" disabled={loading}>
+                {loading
+                  ? "Uploading..."
+                  : editingProduct
+                  ? "Update Product"
+                  : "Add Product"}
               </Button>
             </div>
           </form>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

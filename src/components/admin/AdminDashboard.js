@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Sidebar from "../admin/SideBar";
@@ -11,19 +11,39 @@ import AddProductPage from "../pages/AddProductPage";
 import MessagesPage from "../pages/MessagesPage";
 import OrdersPage from "../pages/OredersPage";
 
-import items from "../../mockData/items.json";
+import { Get } from "../../Api";
+import toast from "react-hot-toast";
 
 export default function AdminDashboard() {
   const [activePage, setActivePage] = useState("products");
-  const [products, setProducts] = useState(items);
+  const [products, setProducts] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  const fetchProducts = async () => {
+    setLoading(true);
+    const response = await Get({ url: "/product" });
+    if (response.success) {
+      const fetchedProducts = response.data?.data || [];
+      setProducts(fetchedProducts);
+    } else {
+      toast.error(`Error getting products: ${response.error}`);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   const handleAddProduct = (product) => {
     if (editingProduct) {
+      // Update product
       setProducts(products.map((p) => (p.id === product.id ? product : p)));
       setEditingProduct(null);
     } else {
+      // Add product
       setProducts([...products, { ...product, id: Date.now().toString() }]);
     }
     setActivePage("products");
@@ -39,7 +59,10 @@ export default function AdminDashboard() {
     setProducts(
       products.map((product) =>
         product.id === productId
-          ? { ...product, status: product.status === "active" ? "hidden" : "active" }
+          ? {
+              ...product,
+              status: product.status === "active" ? "hidden" : "active",
+            }
           : product
       )
     );
@@ -53,6 +76,7 @@ export default function AdminDashboard() {
             products={products}
             onEdit={handleEditProduct}
             onToggleStatus={handleToggleProductStatus}
+            loading={loading}
           />
         );
       case "add-product":
@@ -78,6 +102,7 @@ export default function AdminDashboard() {
             products={products}
             onEdit={handleEditProduct}
             onToggleStatus={handleToggleProductStatus}
+            loading={loading}
           />
         );
     }
@@ -85,15 +110,9 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
       <Sidebar activePage={activePage} setActivePage={setActivePage} />
-
-      {/* Content Area */}
       <div className="flex-1 flex flex-col">
-        {/* Admin Top Navbar */}
         <AdminNavbar />
-
-        {/* Main Page Content */}
         <main className="flex-1 overflow-y-auto p-6 bg-gray-50">
           {renderPage()}
         </main>

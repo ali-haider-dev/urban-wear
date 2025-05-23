@@ -13,6 +13,7 @@ const LoginSchema = Yup.object().shape({
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
   const formik = useFormik({
     initialValues: {
@@ -26,7 +27,7 @@ const Login = () => {
       const handlePress = async () => {
         setLoading(true);
         const data = {
-          email: values.userName,
+          userName: values.userName,
           password: values.password,
         };
         const response = await Post({
@@ -41,6 +42,7 @@ const Login = () => {
         if (response.success) {
           setLoading(true);
           console.log("Login successful", response.data);
+          navigate("/admin/dashboard")
           // navigate("/login");
         } else {
           console.log("Login failed:", response.error);

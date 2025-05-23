@@ -9,44 +9,56 @@ export const Post = async ({
   setErrors = () => {},
 }) => {
   try {
+    const isFormData = data instanceof FormData;
+
     const headers = {
-      "Content-Type": "application/json",
       ...(token && { Authorization: `Bearer ${token}` }),
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
     };
+
     const response = await axios.post(`${BASE_URL}${url}`, data, {
       headers,
     });
 
     if (response.data.isSuccess === false) {
-      console.log("Api error",response.data)
-      return { success: false, error: response.data.errors[0] };
+     
+      if (Array.isArray(response.data.errors)) {
+        return { success: false, error: response.data.errors[0] };
+      }
+
+      return { success: false, error: "Something went wrong." };
     }
+
     return { success: true, data: response.data };
   } catch (error) {
     if (error.response?.status === 400) {
-      const messages = error.response.data.message;
+      const errors = error.response.data.errors;
 
-      //Dynamically create error object from API response
-      let errorObj = {};
-      Object.keys(messages).forEach((key) => {
-        errorObj[key] = messages[key][0]; //error messages ki objects destructuring
-      });
+      if (typeof errors === "object" && !Array.isArray(errors)) {
+        // Field-based errors (e.g., { Name: ["error message"] })
+        let errorObj = {};
 
-      setErrors(errorObj);
-    } else {
-      console.log("Error response", error.response?.data?.message);
-      if (showError) {
-        // ToastAndroid.show(
-        //   error.response?.data?.message || error.message,
-        //   ToastAndroid.SHORT,
-        // );
-        console.error("API Error:", error.response?.data || error.message);
+        Object.keys(errors).forEach((key) => {
+          errorObj[key] = errors[key][0];
+        });
+
+        setErrors(errorObj);
       }
 
-      return { success: false, error: error?.response?.data?.message };
+      if (Array.isArray(errors)) {
+        // Simple error array (e.g., ["Name already used."])
+        return { success: false, error: errors[0] };
+      }
     }
+
+    if (showError) {
+      console.error("API Error:", error.response?.data || error.message);
+    }
+
+    return { success: false, error: error?.response?.data?.message || "Something went wrong." };
   }
 };
+
 
 export const Get = async ({ url, data, token }) => {
   try {
