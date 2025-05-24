@@ -1,8 +1,6 @@
 import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { GlobalContext } from "../../context/GlobalState";
-import { auth } from "../../firebase";
-import { signOut } from "firebase/auth";
 
 const Navbar = ({setUser}) => {
   const { cart } = useContext(GlobalContext);

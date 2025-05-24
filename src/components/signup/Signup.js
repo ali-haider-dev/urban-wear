@@ -2,7 +2,6 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Link } from "react-router-dom";
 import "./index.css";
-import { addDocument, signup } from "../../firebase";
 import { useState } from "react";
 import { Post } from "../../Api";
 import { useNavigate } from "react-router-dom";

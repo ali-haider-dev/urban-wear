@@ -14,7 +14,7 @@ import OrdersPage from "../pages/OredersPage";
 import { Get } from "../../Api";
 import toast from "react-hot-toast";
 
-export default function AdminDashboard() {
+export default function AdminDashboard({ setUser }) {
   const [activePage, setActivePage] = useState("products");
   const [products, setProducts] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -112,7 +112,7 @@ export default function AdminDashboard() {
     <div className="flex h-screen bg-gray-100">
       <Sidebar activePage={activePage} setActivePage={setActivePage} />
       <div className="flex-1 flex flex-col">
-        <AdminNavbar />
+        <AdminNavbar setUser={setUser} />
         <main className="flex-1 overflow-y-auto p-6 bg-gray-50">
           {renderPage()}
         </main>

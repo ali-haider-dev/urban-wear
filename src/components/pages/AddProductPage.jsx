@@ -20,9 +20,9 @@ export default function AddProductPage({ editingProduct }) {
   const [imagesError, setImagesError] = useState(null);
   const [product, setProduct] = useState({
     name: "",
-    brand: "",
+    brandName: "",
     category: "",
-    saleDiscount: 0,
+    discountPerc: 0,
     price: 0,
     stock: 0,
     description: "",
@@ -33,24 +33,25 @@ export default function AddProductPage({ editingProduct }) {
   const [imagePreviews, setImagePreviews] = useState([]);
   const fileInputRef = useRef(null);
 
-  useEffect(() => {
-    if (editingProduct) {
-      setProduct({
-        ...editingProduct,
-        images: [],
-      });
-      setImagePreviews(editingProduct.images || []);
-    } else {
-      resetForm();
-    }
-  }, [editingProduct]);
+useEffect(() => {
+  if (editingProduct) {
+    setProduct({
+      ...editingProduct,
+      images: [], // ✅ no File objects yet
+    });
+    setImagePreviews([editingProduct.imageURL]); // ✅ show preview
+  } else {
+    resetForm();
+  }
+}, [editingProduct]);
+
 
   const resetForm = () => {
     setProduct({
       name: "",
-      brand: "",
+      brandName: "",
       category: "",
-      saleDiscount: 0,
+      discountPerc: 0,
       price: 0,
       stock: 0,
       description: "",
@@ -72,7 +73,7 @@ export default function AddProductPage({ editingProduct }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
     const parsedValue =
-      ["price", "stock", "saleDiscount"].includes(name) && value !== ""
+      ["price", "stock", "discountPerc"].includes(name) && value !== ""
         ? parseFloat(value)
         : value;
     setProduct((prev) => ({ ...prev, [name]: parsedValue }));
@@ -115,9 +116,9 @@ export default function AddProductPage({ editingProduct }) {
     formData.append("Cost", "123");
     formData.append("Price", product.price.toString());
     formData.append("StockInHand", product.stock.toString());
-    formData.append("DiscountPerc", product.saleDiscount.toString());
+    formData.append("DiscountPerc", product.discountPerc.toString());
     formData.append("Category", product.category);
-    formData.append("Brand", product.brand);
+    formData.append("Brand", product.brandName);
 
     product.images.forEach((file) => {
       if (file instanceof File) {
@@ -151,7 +152,7 @@ export default function AddProductPage({ editingProduct }) {
 
     setLoading(false);
   };
-
+  console.log("Product", product);
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">
@@ -185,9 +186,9 @@ export default function AddProductPage({ editingProduct }) {
                 <Label htmlFor="brand">Brand</Label>
                 <Input
                   id="brand"
-                  name="brand"
+                  name="brandName"
                   type="text"
-                  value={product.brand}
+                  value={product.brandName}
                   onChange={handleChange}
                   required
                 />
@@ -199,9 +200,9 @@ export default function AddProductPage({ editingProduct }) {
                 <Label htmlFor="saleDiscount">Sale Discount</Label>
                 <Input
                   id="saleDiscount"
-                  name="saleDiscount"
+                  name="discountPerc"
                   type="number"
-                  value={product.saleDiscount}
+                  value={product.discountPerc}
                   onChange={handleChange}
                   required
                 />

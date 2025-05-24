@@ -48,17 +48,25 @@ function App() {
   const showNavbar =
     isLoggedIn && !hideNavbarRoutes.includes(location.pathname.toLowerCase());
 
-  if (loading) return <div>Loading...</div>;
-
+  if (loading)
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-white z-[9999]">
+        <div className="flex space-x-2 animate-pulse">
+          <div className="w-4 h-4 bg-blue-500 rounded-full animate-bounce" />
+          <div className="w-4 h-4 bg-red-500 rounded-full animate-bounce [animation-delay:0.1s]" />
+          <div className="w-4 h-4 bg-green-500 rounded-full animate-bounce [animation-delay:0.2s]" />
+        </div>
+      </div>
+    );
   return (
     <div className="App">
       <Toaster position="top-right" />
-      {showNavbar && <Navbar setUser={setUser}/>}
+      {showNavbar && <Navbar setUser={setUser} />}
 
       <Routes>
         {!isLoggedIn ? (
           <>
-            <Route path="/login" element={<Login setUser={setUser}/>} />
+            <Route path="/login" element={<Login setUser={setUser} />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
@@ -67,7 +75,10 @@ function App() {
           </>
         ) : isAdmin ? (
           <>
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route
+              path="/admin/dashboard"
+              element={<AdminDashboard setUser={setUser} />}
+            />
             <Route
               path="*"
               element={<Navigate to="/admin/dashboard" replace />}
