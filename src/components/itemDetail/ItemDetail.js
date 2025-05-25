@@ -35,6 +35,19 @@ function ItemDetail() {
     fetchProduct();
   }, []);
 
+  const addToCart = (item) => {
+    console.log("Adding item to cart:", item);
+    const cartData = {
+      id: item.id,
+      name: item.name,
+      brand: item.brand,
+      price: item.price,
+      sellingPrice: item.sellingPrice,
+      discountPerc: item.discountPerc,
+      images: item.images,
+    };
+  };
+
   const toggleMessages = () => {
     setShowMessages(!showMessages);
   };
@@ -74,7 +87,7 @@ function ItemDetail() {
           </div>
           <div className="item-name">{item?.name}</div>
           <div className="item-price">
-            ${item.discountPerc ? item.sellingPrice : item?.price}
+            ${item?.discountPerc ? item.sellingPrice : item?.price}
           </div>
 
           <select className="item-size">
@@ -89,6 +102,7 @@ function ItemDetail() {
               disabled={isAdded}
               onClick={() => {
                 addItemToCartList(item);
+                addToCart(item);
                 setIsAdded(true);
               }}
             >
