@@ -21,9 +21,9 @@ function Item({ name, brandName, price, discountPerc, imageURL, rating }) {
       <img
         src={imageURL || "/placeholder.svg"}
         alt={name}
-        className="w-full h-52 object-cover rounded-t-2xl item-image"
+        className="w-full h-52 object-cover rounded-lg item-image"
       />
-      <div className="p-4 item-details bg-[#e4e2dd]">
+      <div className="p-4 item-details bg-[#454545]">
         <h5
           className="text-md font-semibold text-[#e15600] truncate"
           title={name}
@@ -31,7 +31,7 @@ function Item({ name, brandName, price, discountPerc, imageURL, rating }) {
           {name}
         </h5>
         <p
-          className="text-sm text-gray-500 mb-2 truncate align-start"
+          className="text-sm text-white mb-2 truncate align-start"
           title={brandName}
         >
           by {brandName}
@@ -46,7 +46,7 @@ function Item({ name, brandName, price, discountPerc, imageURL, rating }) {
               className="mr-0.5"
             />
           ))}
-          <span className="text-sm text-gray-600 ml-2">
+          <span className="text-sm text-white ml-2">
             ({rating.toFixed(1)})
           </span>
         </div>
@@ -194,6 +194,7 @@ function HomePage() {
             borderRadius: "30px",
             boxShadow: "0 2px 5px var(--shadow-color)",
             outline: "none",
+            backgroundColor:"#ffffff"
           }}
         />
       </div>

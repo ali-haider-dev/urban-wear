@@ -55,7 +55,7 @@ const ResetPassword = () => {
   return (
     <div className="auth-container">
       <div className="auth-form">
-        <h2>Reset Password</h2>
+        <h2 style={{color:'#e15600'}}>Reset Password</h2>
         <p className="text-sm text-gray-600 text-center mb-4">
           Enter a new password for <strong>{email}</strong>
         </p>

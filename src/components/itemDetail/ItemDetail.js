@@ -94,7 +94,7 @@ function ItemDetail() {
           <img src={item?.images?.[0]?.url || "/placeholder.svg"} alt="Item" />
         </div>
         <div className="item-detail-info">
-          <div className="item-brand" style={{ margin: "0px 10px" }}>
+          <div className="item-brand" style={{ margin: "0px 10px 0px 0px" }}>
             {item?.brand}
           </div>
           <div className="item-name">{item?.name}</div>

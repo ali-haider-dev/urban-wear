@@ -232,8 +232,9 @@ body {
 
 /* 🔥 Card Hover Animation */
 .item-card {
-  background-color: var(--card-background);
+  background-color: #454545;
   border-radius: 8px;
+  border: 1px solid #99927f;
   overflow: hidden;
   box-shadow: 0 4px 6px var(--shadow-color);
   transition: transform 0.3s ease, box-shadow 0.3s ease;

@@ -40,7 +40,7 @@ const ForgotPassword = () => {
   return (
     <div className="auth-container">
       <div className="auth-form">
-        <h2>Forgot Password</h2>
+        <h2 style={{color:'#e15600'}}>Forgot Password</h2>
         <p>
           Enter your email and we will send you the OTP to reset your password.
         </p>

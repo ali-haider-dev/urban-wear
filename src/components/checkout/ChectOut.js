@@ -97,7 +97,7 @@ const Checkout = () => {
   const sizeMap = ["S", "M", "L", "XL"];
   console.log("cartItems check out", cartItems);
   return (
-    <div className="checkout-container shadow-lg">
+    <div className="checkout-container ">
       {isOrdered ? (
         <h3>
           Yay! 🚀 Order placed successfully. <Link to="/">Shop more!</Link>
@@ -111,7 +111,7 @@ const Checkout = () => {
             </div>
             <div className="cart-items">
               {cartItems.map((item) => (
-                <div key={item.id} className="cart-item bg-[#e4e2dd] shadow-lg">
+                <div key={item.id} className="cart-item bg-[#e4e2dd] border-orange-800">
                   <img
                     src={item?.imageURL}
                     alt={item.name}

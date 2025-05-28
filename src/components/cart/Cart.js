@@ -110,13 +110,15 @@ function Cart() {
             {cartItems.map((item) => (
               <div
                 key={item.id}
-                className="bg-[#e4e2dd] shadow-md rounded-lg overflow-hidden flex flex-col md:flex-row items-center"
+                className="rounded-lg overflow-hidden flex flex-col md:flex-row items-center"
+                style={{border:'1px solid #99927f'}}
               >
-                <div className="md:w-32 md:h-32 flex-shrink-0 overflow-hidden">
+                <div className="md:w-32 md:h-32 flex-shrink-0 overflow-hidden rounded-lg">
                   <img
                     src={item?.imageURL || "/placeholder.svg"}
                     alt={item.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover ml-2"
+                    style={{borderRadius:'10px'}}
                   />
                 </div>
 
@@ -136,17 +138,17 @@ function Cart() {
                         <div className="flex items-center rounded border border-gray-300">
                           <button
                             onClick={() => handleDecrease(item)}
-                            className="px-3 py-2 bg-[#e15600]"
+                            className="px-2 py-1 bg-[#e15600]"
                             aria-label={`Decrease quantity of ${item.name}`}
                           >
                             -
                           </button>
-                          <span className="px-4 text-gray-800">
+                          <span className="px-2 text-gray-800">
                             {item.quantity || 1}
                           </span>
                           <button
                             onClick={() => handleIncrease(item)}
-                            className="px-3 py-2 bg-[#e15600]"
+                            className="px-2 py-1 bg-[#e15600]"
                             aria-label={`Increase quantity of ${item.name}`}
                           >
                             +
@@ -155,7 +157,7 @@ function Cart() {
                       </div>
                     </div>
 
-                    <div className="font-semibold text-gray-900">
+                    <div className="font-semibold text-gray-900 text-[24px] text-orange-700 mt-3">
                       ${(item.price * (item.quantity || 1)).toFixed(2)}
                     </div>
                   </div>
@@ -165,7 +167,7 @@ function Cart() {
           </div>
 
           {/* Order Summary */}
-          <div className="lg:w-2/4 h-2/4 bg-[#e4e2dd] shadow-md rounded-lg p-4">
+          <div className="lg:w-2/4 h-2/4  shadow-md rounded-lg p-4 border border-[#99927f]">
             <h3 className="text-lg font-semibold text-gray-900 mb-3">
               Order Summary
             </h3>
@@ -202,7 +204,7 @@ function Cart() {
             </div>
 
             <Link to="/checkout">
-              <button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg transition-colors duration-300">
+              <button className="w-full bg-orange-500 hover:bg-[#e15600] text-white font-semibold py-3 rounded rounded-lg transition-colors duration-300">
                 Checkout
               </button>
             </Link>

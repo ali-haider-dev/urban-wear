@@ -47,7 +47,7 @@ const VerifyOtp = () => {
   return (
     <div className="auth-container">
       <div className="auth-form">
-        <h2>Verify OTP</h2>
+        <h2 style={{color:'#e15600'}}>Verify OTP</h2>
         <p className="text-sm text-gray-600 text-center mb-4">
           Enter the 6-digit OTP sent to <strong>{email}</strong>
         </p>
