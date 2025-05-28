@@ -6,7 +6,7 @@ import { MessageCircle } from "lucide-react";
 import "./ItemDetail.css";
 import items from "../../mockData/items.json";
 import { GlobalContext } from "../../context/GlobalState";
-import { Get } from "../../Api";
+import { Get, Put } from "../../Api";
 import toast from "react-hot-toast";
 
 function ItemDetail() {
@@ -15,6 +15,7 @@ function ItemDetail() {
   const [item, setItem] = useState();
   const [loading, setLoading] = useState(false);
   const { addItemToCartList, cart } = useContext(GlobalContext);
+  const [size, setSize] = useState("0");
   const [isAdded, setIsAdded] = useState(
     cart.findIndex((c) => c.id === itemId) > -1
   );
@@ -35,17 +36,28 @@ function ItemDetail() {
     fetchProduct();
   }, []);
 
-  const addToCart = (item) => {
+  const addToCart = async (item) => {
     console.log("Adding item to cart:", item);
+    console.log("size", size);
+    const token = localStorage.getItem("token");
     const cartData = {
       id: item.id,
-      name: item.name,
-      brand: item.brand,
-      price: item.price,
-      sellingPrice: item.sellingPrice,
-      discountPerc: item.discountPerc,
-      images: item.images,
+      size: Number(size),
+      quantity: 1,
     };
+    const response = await Put({
+      url: `/cart/product/${item.id}`,
+      data: cartData,
+      token,
+    });
+    if (response?.success) {
+      console.log("cart resposnse", response.data.data.products);
+        addItemToCartList(item,size);
+    } else {
+      toast.error(`Error adding item to cart: ${response.error}`);
+    }
+
+    // addItemToCartList(item);
   };
 
   const toggleMessages = () => {
@@ -76,7 +88,7 @@ function ItemDetail() {
   }
   return (
     <div className="item-detail-container">
-      <Link to="/"> &#8592; Back</Link>
+      <div style={{alignSelf:'flex-start'}}><Link to="/"> &#8592; Back</Link></div>
       <div className="item-detail">
         <div className="item-detail-image">
           <img src={item?.images?.[0]?.url || "/placeholder.svg"} alt="Item" />
@@ -90,28 +102,30 @@ function ItemDetail() {
             ${item?.discountPerc ? item.sellingPrice : item?.price}
           </div>
 
-          <select className="item-size">
-            <option value={"S"}> Select size (S)</option>
-            <option value={"M"}> Select size (M)</option>
-            <option value={"L"}> Select size (L)</option>
-            <option value={"XL"}> Select size (XL)</option>
+          <select
+            className="item-size"
+            onChange={(e) => setSize(e.target.value)}
+          >
+            <option value={"0"}> Select size (S)</option>
+            <option value={"1"}> Select size (M)</option>
+            <option value={"2"}> Select size (L)</option>
+            <option value={"3"}> Select size (XL)</option>
           </select>
           <div className="button-container">
             <button
               className="item-btn"
-              disabled={isAdded}
+              // disabled={isAdded}
               onClick={() => {
-                addItemToCartList(item);
                 addToCart(item);
                 setIsAdded(true);
               }}
             >
               {isAdded ? "Added to cart" : "Add To bag"}
             </button>
-            <button className="share-btn" onClick={toggleMessages}>
+            {/* <button className="share-btn" onClick={toggleMessages}>
               <MessageCircle size={20} />
               Share
-            </button>
+            </button> */}
           </div>
           <p className="item-description">
             Lorem Ipsum is simply dummy text of the printing and typesetting

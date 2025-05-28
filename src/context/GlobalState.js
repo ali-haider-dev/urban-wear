@@ -1,5 +1,5 @@
 import React, { createContext, useReducer } from "react";
-import {AppReducer} from "./AppReducer";
+import { AppReducer } from "./AppReducer";
 
 // Initial state
 const initialState = {
@@ -8,24 +8,32 @@ const initialState = {
 };
 
 // Create context
-export const GlobalContext = createContext(initialState); // Define and export GlobalContext here
+export const GlobalContext = createContext(initialState);
 
 // GlobalProvider component
 export const GlobalProvider = ({ children }) => {
   const [state, dispatch] = useReducer(AppReducer, initialState);
 
   // Actions
-  const addItemToCartList = (item) => {
+  const addItemToCartList = (item, size) => {
     dispatch({
       type: "ADD_ITEM_IN_CART",
-      payload: item,
+      payload: { item, size },
     });
   };
 
-  const removeItemFromCartList = (item) => {
+  const setCartItems = (cartArray) => {
+    console.log("Setting cart items:", cartArray);
+    dispatch({
+      type: "SET_CART_ITEMS",
+      payload: cartArray,
+    });
+  };
+
+  const removeItemFromCartList = (itemId, size) => {
     dispatch({
       type: "REMOVE_ITEM_IN_CART",
-      payload: item,
+      payload: { id: itemId, size },
     });
   };
 
@@ -41,10 +49,11 @@ export const GlobalProvider = ({ children }) => {
       payload: item,
     });
   };
-  const updateCartItem = (itemId, change) => {
+
+  const updateCartItem = (itemId, size, change) => {
     dispatch({
       type: "UPDATE_CART_ITEM",
-      payload: { id: itemId, change },
+      payload: { id: itemId, size: size, change: change },
     });
   };
 
@@ -65,7 +74,8 @@ export const GlobalProvider = ({ children }) => {
         clearCart,
         addItemToOrderList,
         removeItemFromOrderList,
-        updateCartItem 
+        updateCartItem,
+        setCartItems,
       }}
     >
       {children}

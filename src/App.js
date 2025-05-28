@@ -20,6 +20,7 @@ import AdminDashboard from "./components/admin/AdminDashboard";
 import ForgotPassword from "./components/ForgotPassword/ForgotPassword";
 import ResetPassword from "./components/ForgotPassword/ResetPassword";
 import VerifyOtp from "./components/ForgotPassword/VerifyOtp";
+import Payment from "./components/payment/Payment";
 
 function App() {
   const location = useLocation();
@@ -91,6 +92,7 @@ function App() {
             <Route path="/cart" element={<Cart />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/payment" element={<Payment />} />
             <Route path="*" element={<Navigate to="/home" replace />} />
           </>
         )}

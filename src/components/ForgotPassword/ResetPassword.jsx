@@ -3,29 +3,26 @@ import * as Yup from "yup";
 import "./index.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Post } from "../../Api";
+
 const LoginSchema = Yup.object().shape({
   password: Yup.string()
     .min(8, "Password must be at least 8 characters")
-    .matches(/[A-Z]/, "Passwords must have at least one uppercase ('A'-'Z').")
-    .matches(/\d/, "Passwords must have at least one digit ('0'-'9').")
+    .matches(/[A-Z]/, "Password must have at least one uppercase letter")
+    .matches(/\d/, "Password must have at least one digit")
     .matches(
       /[^a-zA-Z0-9]/,
-      "Passwords must have at least one non alphanumeric character."
+      "Password must have at least one special character"
     )
-    .required("password field is required"),
- confirmPassword: Yup.string()
-  .required("Confirm Password field is required")
-  .test("passwords-match", "Passwords must match", function (value) {
-    return this.parent.password === value;
-  }),
+    .required("Password is required"),
+  confirmPassword: Yup.string()
+    .required("Confirm Password is required")
+    .oneOf([Yup.ref("password")], "Passwords must match"),
 });
 
 const ResetPassword = () => {
   const location = useLocation();
   const { email, reset_token } = location.state || {};
   const navigate = useNavigate();
-  console.log("Email:", email);
-  console.log("Token:", reset_token);
 
   const formik = useFormik({
     initialValues: {
@@ -34,9 +31,6 @@ const ResetPassword = () => {
     },
     validationSchema: LoginSchema,
     onSubmit: (values) => {
-      // Handle form submission here
-      console.log(values);
-
       const handlePress = async () => {
         const data = {
           password: values.password,
@@ -46,16 +40,12 @@ const ResetPassword = () => {
 
         const response = await Post({
           url: "/auth/resetPassword",
-          data: data,
-          setErrors: (errors) => {},
+          data,
+          setErrors: () => {},
         });
-
-        console.log(response.success);
 
         if (response.success) {
           navigate("/login");
-        } else {
-          console.log(response.success);
         }
       };
       handlePress();
@@ -66,42 +56,51 @@ const ResetPassword = () => {
     <div className="auth-container">
       <div className="auth-form">
         <h2>Reset Password</h2>
+        <p className="text-sm text-gray-600 text-center mb-4">
+          Enter a new password for <strong>{email}</strong>
+        </p>
         <form onSubmit={formik.handleSubmit}>
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">New Password</label>
             <input
               id="password"
               name="password"
               type="password"
+              placeholder="Enter new password"
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               value={formik.values.password}
             />
-            {formik.touched.password && formik.errors.password ? (
+            {formik.touched.password && formik.errors.password && (
               <div className="error">{formik.errors.password}</div>
-            ) : null}
+            )}
           </div>
+
           <div className="form-group">
-            <label htmlFor="confirmPassword">Reset Password</label>
+            <label htmlFor="confirmPassword">Confirm Password</label>
             <input
               id="confirmPassword"
               name="confirmPassword"
               type="password"
+              placeholder="Re-enter new password"
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               value={formik.values.confirmPassword}
             />
-            {formik.touched.confirmPassword && formik.errors.confirmPassword ? (
-              <div className="error">{formik.errors.confirmPassword}</div>
-            ) : null}
+            {formik.touched.confirmPassword &&
+              formik.errors.confirmPassword && (
+                <div className="error">{formik.errors.confirmPassword}</div>
+              )}
           </div>
-          <button
-         
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-60 transition transform hover:scale-105"
-          >
+
+          <button type="submit" className="submit-btn">
             Reset
           </button>
         </form>
+
+        <div className="auth-link">
+          Remembered your password? <a href="/login">Back to Login</a>
+        </div>
       </div>
     </div>
   );

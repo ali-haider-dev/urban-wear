@@ -29,7 +29,7 @@ body {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background-color: var(--primary-color);
+  background-color: #e15600;
   color: white;
   border: none;
   cursor: pointer;
@@ -41,7 +41,7 @@ body {
 }
 
 .floating-message-icon:hover {
-  background-color: var(--primary-dark);
+  background-color: #e15600;
   transform: scale(1.1);
 }
 
@@ -65,7 +65,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 15px;
-  background-color: var(--primary-color);
+  background-color: #e15600;
   color: white;
 }
 
@@ -79,7 +79,7 @@ body {
   border: none;
   cursor: pointer;
   color: white;
-  font-size: 1.1em;
+  font-size: 1.5em;
 }
 
 .message-list {
@@ -118,7 +118,7 @@ body {
 }
 
 .message.user {
-  background-color: var(--primary-color);
+  background-color: #e15600;
   color: white;
   border-bottom-right-radius: 4px;
 }
@@ -128,7 +128,11 @@ body {
   color: #111;
   border-bottom-left-radius: 4px;
 }
-
+.message.assistant >body {
+  background-color: #e15600;
+  color: #111;
+  border-bottom-left-radius: 4px;
+}
 /* ⬇️ Assistant avatar */
 
 .avatar {
@@ -157,7 +161,7 @@ body {
 }
 
 .message-input-container button {
-  background-color: var(--primary-color);
+  background-color: #e15600;
   color: white;
   border: none;
   border-radius: 50%;
@@ -171,7 +175,7 @@ body {
 }
 
 .message-input-container button:hover {
-  background-color: var(--primary-dark);
+  background-color: #e15600;
   transform: scale(1.1);
 }
 
@@ -202,6 +206,43 @@ body {
   to {
     transform: rotate(360deg);
   }
+}
+/* 🔍 Search Bar Styling */
+.search-bar-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 30px auto 0 auto;
+  padding: 0 20px;
+}
+
+.search-bar {
+  width: 100%;
+  padding: 12px 20px;
+  font-size: 1em;
+  border: 1px solid #ccc;
+  border-radius: 30px;
+  box-shadow: 0 2px 5px var(--shadow-color);
+  transition: box-shadow 0.3s ease;
+}
+
+.search-bar:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+/* 🔥 Card Hover Animation */
+.item-card {
+  background-color: var(--card-background);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px var(--shadow-color);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.item-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 16px var(--shadow-color);
 }
 
 /* ⬇️ Responsive */

@@ -5,35 +5,38 @@ import { Get, Post } from "../../Api";
 import toast from "react-hot-toast";
 import parse from "html-react-parser";
 import "./Home.css";
-
+import bot from "../../utils/bot.png"; // Adjust the path as necessary
 function Item({ name, brandName, price, discountPerc, imageURL, rating }) {
   const discountedPrice = discountPerc
     ? price - (price * discountPerc) / 100
     : price;
 
   return (
-    <div className="relative bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 cursor-pointer max-w-xs mx-auto">
+    <div className="relative bg-[#e4e2dd] rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 cursor-pointer max-w-xs mx-auto item-card">
       {discountPerc > 0 && (
-        <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-md z-10">
+        <div className="absolute top-3 left-3 bg-[#e15600] text-white text-xs font-semibold px-2 py-1 rounded-md z-10">
           {discountPerc}% OFF
         </div>
       )}
       <img
         src={imageURL || "/placeholder.svg"}
         alt={name}
-        className="w-full h-52 object-cover rounded-t-2xl"
+        className="w-full h-52 object-cover rounded-t-2xl item-image"
       />
-      <div className="p-4">
-        <h3
-          className="text-lg font-semibold text-gray-900 truncate"
+      <div className="p-4 item-details bg-[#e4e2dd]">
+        <h5
+          className="text-md font-semibold text-[#e15600] truncate"
           title={name}
         >
           {name}
-        </h3>
-        <p className="text-sm text-gray-500 mb-2 truncate" title={brandName}>
+        </h5>
+        <p
+          className="text-sm text-gray-500 mb-2 truncate align-start"
+          title={brandName}
+        >
           by {brandName}
         </p>
-        <div className="flex items-center mb-3">
+        <div className="flex items-center mb-3 item-rating">
           {[...Array(5)].map((_, i) => (
             <Star
               key={i}
@@ -48,11 +51,11 @@ function Item({ name, brandName, price, discountPerc, imageURL, rating }) {
           </span>
         </div>
         <div className="flex items-baseline space-x-2">
-          <span className="text-xl font-bold text-gray-900">
+          <span className="text-xl font-bold text-[#e15600] ">
             ${discountedPrice.toFixed(2)}
           </span>
           {discountPerc > 0 && (
-            <span className="text-sm line-through text-gray-400">
+            <span className="text-sm line-through text-[#e15600]">
               ${price.toFixed(2)}
             </span>
           )}
@@ -67,7 +70,8 @@ function HomePage() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [products, setProducts] = useState("");
+  const [products, setProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const token = localStorage.getItem("token");
   const messageEndRef = useRef(null);
 
@@ -82,7 +86,10 @@ function HomePage() {
   }, [messages]);
 
   const fetchProducts = async () => {
-    const response = await Get({ url: "/product", token });
+    const data = {
+      PageSize: 50,
+    };
+    const response = await Get({ url: "/product", token, data });
     if (response.success) {
       setProducts(response.data?.data || []);
     } else {
@@ -107,8 +114,6 @@ function HomePage() {
 
       if (response.success) {
         const rawMessages = response.data?.data || [];
-
-        // 🔁 Convert API format to frontend format
         const formattedMessages = rawMessages.map((m) => ({
           sender: m.role === 0 ? "user" : "assistant",
           text:
@@ -116,7 +121,6 @@ function HomePage() {
               ? m.message.replace(/^Role:\s*Assistant\s*/i, "").trim()
               : m.message.trim(),
         }));
-
         setMessages(formattedMessages);
       } else {
         toast.error(`Error loading messages: ${response.error}`);
@@ -154,11 +158,49 @@ function HomePage() {
     setIsLoading(false);
   };
 
+  const filteredProducts = products.filter(
+    (item) =>
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item?.categoryName?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (products.length < 1)
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-white z-[9999]">
+        <div className="flex space-x-2 animate-pulse">
+          <div className="w-4 h-4 bg-blue-500 rounded-full animate-bounce" />
+          <div className="w-4 h-4 bg-red-500 rounded-full animate-bounce [animation-delay:0.1s]" />
+          <div className="w-4 h-4 bg-green-500 rounded-full animate-bounce [animation-delay:0.2s]" />
+        </div>
+      </div>
+    );
+
   return (
-    <section>
+    <section style={{ height: "100vh" }}>
+      {/* Search Bar */}
+      <div
+        style={{ maxWidth: "800px", margin: "30px auto 0", padding: "0 20px" }}
+      >
+        <input
+          type="text"
+          placeholder="Search products..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{
+            width: "100%",
+            padding: "12px 20px",
+            fontSize: "1em",
+            border: "1px solid #ccc",
+            borderRadius: "30px",
+            boxShadow: "0 2px 5px var(--shadow-color)",
+            outline: "none",
+          }}
+        />
+      </div>
+
       <div className="item-list">
-        {products ? (
-          products.map((item) => (
+        {filteredProducts.length > 0 ? (
+          filteredProducts.map((item) => (
             <Link to={`/item/${item.id}`} key={item.id}>
               <Item
                 name={item.name}
@@ -171,13 +213,9 @@ function HomePage() {
             </Link>
           ))
         ) : (
-          <div className="fixed inset-0 flex items-center justify-center bg-white z-[9999]">
-            <div className="flex space-x-2 animate-pulse">
-              <div className="w-4 h-4 bg-blue-500 rounded-full animate-bounce" />
-              <div className="w-4 h-4 bg-red-500 rounded-full animate-bounce [animation-delay:0.1s]" />
-              <div className="w-4 h-4 bg-green-500 rounded-full animate-bounce [animation-delay:0.2s]" />
-            </div>
-          </div>
+          <p className="text-center text-gray-500 w-full h-full">
+            No matching products found.
+          </p>
         )}
       </div>
 
@@ -196,7 +234,7 @@ function HomePage() {
               <div key={index} className={`message-row ${msg.sender}`}>
                 {msg.sender === "assistant" && (
                   <img
-                    src="/urbanwear-bot-avatar.png"
+                    src={bot}
                     alt="Assistant"
                     className="avatar"
                   />

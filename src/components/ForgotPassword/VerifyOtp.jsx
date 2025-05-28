@@ -6,7 +6,7 @@ import { Post } from "../../Api";
 import { useState } from "react";
 
 const LoginSchema = Yup.object().shape({
-  otp: Yup.string().required("Otp field is Required"),
+  otp: Yup.string().required("OTP is required"),
 });
 
 const VerifyOtp = () => {
@@ -14,28 +14,20 @@ const VerifyOtp = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email;
+
   const formik = useFormik({
     initialValues: {
       otp: "",
     },
     validationSchema: LoginSchema,
     onSubmit: (values) => {
-      // Handle form submission here
-      console.log(values);
       const handlePress = async () => {
         setOtpError("");
-        const data = {
-          otp: values.otp,
-          email: email,
-        };
-
         const response = await Post({
           url: "/auth/verifyOTP",
-          data: data,
-          setErrors: (errors) => {},
+          data: { otp: values.otp, email },
+          setErrors: () => {},
         });
-
-        console.log(response.success);
 
         if (response.success) {
           navigate("/reset-password", {
@@ -56,9 +48,10 @@ const VerifyOtp = () => {
     <div className="auth-container">
       <div className="auth-form">
         <h2>Verify OTP</h2>
-        <p className="my-4 color-gray">
-          Enter the 6 digit OTP sent to your email
+        <p className="text-sm text-gray-600 text-center mb-4">
+          Enter the 6-digit OTP sent to <strong>{email}</strong>
         </p>
+
         <form onSubmit={formik.handleSubmit}>
           <div className="form-group">
             <label htmlFor="otp">OTP</label>
@@ -66,20 +59,27 @@ const VerifyOtp = () => {
               id="otp"
               name="otp"
               type="number"
+              placeholder="Enter OTP"
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               value={formik.values.otp}
             />
-            {formik.touched.otp && formik.errors.otp ? (
-              <div className="error">{formik.errors.otp}</div>
-            ) : (
-              <div className="error">{OtpError}</div>
-            )}
+            {(formik.touched.otp && formik.errors.otp) || OtpError ? (
+              <div className="error">{formik.errors.otp || OtpError}</div>
+            ) : null}
           </div>
-          <button className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-60 transition transform hover:scale-105">
+
+          <button
+            type="submit"
+            className="submit-btn"
+          >
             Verify
           </button>
         </form>
+
+        <div className="auth-link">
+          Didn’t get the OTP? <a href="/forgot-password">Resend</a>
+        </div>
       </div>
     </div>
   );
