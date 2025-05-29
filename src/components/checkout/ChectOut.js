@@ -77,10 +77,16 @@ const Checkout = () => {
   };
 
   const handleQuantityChange = async (item, itemId, change) => {
+    console.log(
+      "handleQuantityChange called with item:",
+      itemId,
+      "change:",
+      change
+    );
     const token = localStorage.getItem("token");
     const cartData = {
-      id: item.id,
-      quantity: -1,
+      id: itemId,
+      quantity: change,
     };
     const response = await Put({
       url: `/cart/product/${item.id}`,
@@ -111,7 +117,10 @@ const Checkout = () => {
             </div>
             <div className="cart-items">
               {cartItems.map((item) => (
-                <div key={item.id} className="cart-item bg-[#e4e2dd] border-orange-800">
+                <div
+                  key={item.id}
+                  className="cart-item bg-[#e4e2dd] border-orange-800"
+                >
                   <img
                     src={item?.imageURL}
                     alt={item.name}
@@ -135,7 +144,7 @@ const Checkout = () => {
                         </button>
                         <span>{item.quantity}</span>
                         <button
-                          onClick={() => handleQuantityChange(item.id, 1)}
+                          onClick={() => handleQuantityChange(item, item.id, 1)}
                         >
                           +
                         </button>

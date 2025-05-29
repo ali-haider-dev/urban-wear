@@ -1,0 +1,10 @@
+p {
+  font-size: 14px;
+  color: #fa0404;
+  text-align: center;
+  margin-bottom: 20px;
+}
+input {
+  border-radius: 8px;
+  border: 1px solid #99927f !important;
+}

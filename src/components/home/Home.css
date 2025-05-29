@@ -75,8 +75,8 @@ body {
 }
 
 .message-header button {
-  background: none;
-  border: none;
+  background: #e15600;
+  border: 1px solid #e15600;
   cursor: pointer;
   color: white;
   font-size: 1.5em;
@@ -246,6 +246,198 @@ body {
   box-shadow: 0 10px 16px var(--shadow-color);
 }
 
+/* ⬇️ NEW STYLES FOR ENHANCED FEATURES - Language Dropdown & Mode Toggle */
+
+/* Language Dropdown Styles */
+.language-dropdown {
+  position: relative;
+}
+
+.language-dropdown button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.875rem;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.language-dropdown button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.language-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 50;
+  min-width: 120px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.language-dropdown-menu button {
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  background: none;
+  border: none;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.language-dropdown-menu button:hover {
+  background-color: #f3f4f6;
+}
+
+.language-dropdown-menu button.selected {
+  background-color: #e5e7eb;
+  font-weight: 600;
+}
+
+/* Mode Toggle Styles */
+.mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mode-toggle button {
+  padding: 4px;
+  border-radius: 4px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mode-toggle button.active {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.mode-toggle button.inactive {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.mode-toggle button:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Enhanced Header Layout */
+.message-header .flex {
+  display: flex;
+}
+
+.message-header .items-center {
+  align-items: center;
+}
+
+.message-header .gap-2 {
+  gap: 8px;
+}
+
+.message-header .gap-1 {
+  gap: 4px;
+}
+
+.message-header .text-sm {
+  font-size: 0.875rem;
+}
+
+.message-header .text-xs {
+  font-size: 0.75rem;
+}
+
+/* Utility Classes for Better Organization */
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.top-full {
+  top: 100%;
+}
+
+.left-0 {
+  left: 0;
+}
+
+.mt-1 {
+  margin-top: 4px;
+}
+
+.bg-white {
+  background-color: white;
+}
+
+.border {
+  border: 1px solid #e0e0e0;
+}
+
+.rounded {
+  border-radius: 6px;
+}
+
+.shadow-lg {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.z-50 {
+  z-index: 50;
+}
+
+.min-w-120 {
+  min-width: 120px;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.px-3 {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.py-2 {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.hover-bg-gray-100:hover {
+  background-color: #f3f4f6;
+}
+
+.bg-gray-200 {
+  background-color: #e5e7eb;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
 /* ⬇️ Responsive */
 
 @media (max-width: 768px) {
@@ -259,5 +451,21 @@ body {
     left: 20px;
     right: 20px;
     bottom: 80px;
+  }
+
+  /* Adjust language dropdown for mobile */
+  .language-dropdown-menu {
+    right: 0;
+    left: auto;
+    min-width: 100px;
+  }
+
+  /* Adjust header spacing for mobile */
+  .message-header .gap-2 {
+    gap: 6px;
+  }
+
+  .message-header .gap-1 {
+    gap: 2px;
   }
 }

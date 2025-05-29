@@ -80,6 +80,7 @@ function App() {
               path="/admin/dashboard"
               element={<AdminDashboard setUser={setUser} />}
             />
+
             <Route
               path="*"
               element={<Navigate to="/admin/dashboard" replace />}

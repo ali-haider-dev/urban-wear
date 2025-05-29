@@ -97,7 +97,9 @@ function Cart() {
   const sizeMap = ["S", "M", "L", "XL"];
   return (
     <div className="max-w-3xl py-6 px-4 sm:px-6 lg:px-8">
-      <h1 className="text-2xl font-semibold text-orange-600 mb-4">Your Basket</h1>
+      <h1 className="text-2xl font-semibold text-orange-600 mb-4">
+        Your Basket
+      </h1>
 
       {cartItems.length === 0 ? (
         <p className="text-center text-gray-600 text-lg">
@@ -111,14 +113,14 @@ function Cart() {
               <div
                 key={item.id}
                 className="rounded-lg overflow-hidden flex flex-col md:flex-row items-center"
-                style={{border:'1px solid #99927f'}}
+                style={{ border: "1px solid #99927f" }}
               >
                 <div className="md:w-32 md:h-32 flex-shrink-0 overflow-hidden rounded-lg">
                   <img
                     src={item?.imageURL || "/placeholder.svg"}
                     alt={item.name}
                     className="w-full h-full object-cover ml-2"
-                    style={{borderRadius:'10px'}}
+                    style={{ borderRadius: "10px" }}
                   />
                 </div>
 
@@ -156,10 +158,15 @@ function Cart() {
                         </div>
                       </div>
                     </div>
-
-                    <div className="font-semibold text-gray-900 text-[24px] text-orange-700 mt-3">
-                      ${(item.price * (item.quantity || 1)).toFixed(2)}
-                    </div>
+                    {item.discountPerc ? (
+                      <div className="font-semibold text-gray-900 text-[24px] text-orange-700 mt-3">
+                        ${(item.sellingPrice * (item.quantity || 1)).toFixed(2)}
+                      </div>
+                    ) : (
+                      <div className="font-semibold text-gray-900 text-[24px] text-orange-700 mt-3">
+                        ${(item.price * (item.quantity || 1)).toFixed(2)}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -174,11 +181,14 @@ function Cart() {
 
             <div className="flex justify-between text-gray-600 mb-2">
               <span>Subtotal:</span>
+
               <span>
                 $
                 {cartItems
                   .reduce(
-                    (sum, item) => sum + item.price * (item.quantity || 1),
+                    (sum, item) =>
+                      sum + item.sellingPrice ||
+                      item.price * (item.quantity || 1),
                     0
                   )
                   .toFixed(2)}
@@ -192,11 +202,13 @@ function Cart() {
 
             <div className="flex justify-between font-semibold text-gray-900 mb-4">
               <span>Total:</span>
-              <span  >
+              <span>
                 $
                 {cartItems
                   .reduce(
-                    (sum, item) => sum + item.price * (item.quantity || 1),
+                    (sum, item) =>
+                      sum + item.sellingPrice ||
+                      item.price * (item.quantity || 1),
                     0
                   )
                   .toFixed(2)}

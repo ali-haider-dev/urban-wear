@@ -6,7 +6,7 @@ import { Label } from "../ui/Label";
 import { Textarea } from "../ui/Textarea";
 import { Upload, X } from "lucide-react";
 import toast from "react-hot-toast";
-import { Post } from "../../Api";
+import { Post, Put } from "../../Api";
 
 export default function AddProductPage({ editingProduct }) {
   const [loading, setLoading] = useState(false);
@@ -18,6 +18,7 @@ export default function AddProductPage({ editingProduct }) {
   const [stockError, setStockError] = useState(null);
   const [descriptionError, setDescriptionError] = useState(null);
   const [imagesError, setImagesError] = useState(null);
+  const [colorError, setColorError] = useState(null);
   const [product, setProduct] = useState({
     name: "",
     brandName: "",
@@ -28,23 +29,23 @@ export default function AddProductPage({ editingProduct }) {
     description: "",
     status: "Active",
     images: [],
+    color: "",
   });
 
   const [imagePreviews, setImagePreviews] = useState([]);
   const fileInputRef = useRef(null);
 
-useEffect(() => {
-  if (editingProduct) {
-    setProduct({
-      ...editingProduct,
-      images: [], // ✅ no File objects yet
-    });
-    setImagePreviews([editingProduct.imageURL]); // ✅ show preview
-  } else {
-    resetForm();
-  }
-}, [editingProduct]);
-
+  useEffect(() => {
+    if (editingProduct) {
+      setProduct({
+        ...editingProduct,
+        images: [editingProduct.imageURL], // ✅ no File objects yet
+      });
+      setImagePreviews([editingProduct.imageURL]); // ✅ show preview
+    } else {
+      resetForm();
+    }
+  }, [editingProduct]);
 
   const resetForm = () => {
     setProduct({
@@ -57,6 +58,7 @@ useEffect(() => {
       description: "",
       status: "Active",
       images: [],
+      color: "",
     });
     setImagePreviews([]);
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -68,6 +70,7 @@ useEffect(() => {
     setStockError(null);
     setDescriptionError(null);
     setImagesError(null);
+    setColorError(null);
   };
 
   const handleChange = (e) => {
@@ -101,6 +104,8 @@ useEffect(() => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    // Clear previous errors
     setNameError(null);
     setBrandError(null);
     setCategoryError(null);
@@ -109,6 +114,9 @@ useEffect(() => {
     setStockError(null);
     setDescriptionError(null);
     setImagesError(null);
+    setColorError(null);
+
+    // Prepare FormData
     const formData = new FormData();
     formData.append("Name", product.name);
     formData.append("SKU", "123");
@@ -119,6 +127,8 @@ useEffect(() => {
     formData.append("DiscountPerc", product.discountPerc.toString());
     formData.append("Category", product.category);
     formData.append("Brand", product.brandName);
+    formData.append("Color", product.color);
+    editingProduct && formData.append("DeletedImageIdsarray", []);
 
     product.images.forEach((file) => {
       if (file instanceof File) {
@@ -126,8 +136,11 @@ useEffect(() => {
       }
     });
 
-    const response = await Post({
-      url: "/product",
+    const isEdit = Boolean(editingProduct);
+    const url = isEdit ? `/product/${editingProduct.id}` : "/product";
+
+    const response = await (isEdit ? Put : Post)({
+      url: url,
       data: formData,
       setErrors: (errors) => {
         setNameError(errors?.Name || null);
@@ -138,21 +151,32 @@ useEffect(() => {
         setStockError(errors?.StockInHand || null);
         setDescriptionError(errors?.Description || null);
         setImagesError(errors?.images || null);
+        setColorError(errors?.Color || null);
       },
       showError: true,
     });
 
     if (response?.success) {
-      toast.success("Product uploaded successfully");
+      toast.success(
+        isEdit
+          ? "Product updated successfully"
+          : "Product uploaded successfully"
+      );
       resetForm();
     } else {
-      toast.error(`upload failed ${response?.error}`);
-      console.error("Upload failed:", response?.error);
+      toast.error(
+        isEdit
+          ? `Update failed: ${response?.error}`
+          : `Upload failed: ${response?.error}`
+      );
+      console.error("Error:", response?.error);
     }
 
     setLoading(false);
   };
+
   console.log("Product", product);
+  console.log("EditingProduct", editingProduct);
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">
@@ -189,6 +213,20 @@ useEffect(() => {
                   name="brandName"
                   type="text"
                   value={product.brandName}
+                  onChange={handleChange}
+                  required
+                />
+                {brandError && (
+                  <p className="text-red-600 text-sm">{brandError}</p>
+                )}
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="color">Color</Label>
+                <Input
+                  id="color"
+                  name="color"
+                  type="text"
+                  value={product.color}
                   onChange={handleChange}
                   required
                 />

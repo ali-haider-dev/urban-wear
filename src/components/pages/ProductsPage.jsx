@@ -55,7 +55,7 @@ export default function ProductsPage({ products, onEdit, onToggleStatus }) {
                   ${product.price?.toFixed(2) || "0.00"}
                 </span>
                 <span className="text-sm text-gray-500">
-                  Stock: {product.stock || "N/A"}
+                  Stock: {product.stockInHand || "N/A"}
                 </span>
               </div>
               <div className="mt-2">

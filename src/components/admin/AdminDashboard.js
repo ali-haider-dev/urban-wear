@@ -9,10 +9,11 @@ import AdminNavbar from "../admin/AdminNavbar";
 import ProductsPage from "../pages/ProductsPage";
 import AddProductPage from "../pages/AddProductPage";
 import MessagesPage from "../pages/MessagesPage";
-import OrdersPage from "../pages/OredersPage";
+import OrdersPage from "../pages/OrdersPage";
 
 import { Get } from "../../Api";
 import toast from "react-hot-toast";
+import OrderDetail from "../pages/OrderDetail";
 
 export default function AdminDashboard({ setUser }) {
   const [activePage, setActivePage] = useState("products");
@@ -20,7 +21,7 @@ export default function AdminDashboard({ setUser }) {
   const [editingProduct, setEditingProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-
+  const [orderId, setOrderId] = useState("");
   const fetchProducts = async () => {
     setLoading(true);
     const response = await Get({ url: "/product" });
@@ -94,8 +95,12 @@ export default function AdminDashboard({ setUser }) {
             products={products}
             onEdit={handleEditProduct}
             onToggleStatus={handleToggleProductStatus}
+            setActivePage={setActivePage}
+            setOrderId={setOrderId}
           />
         );
+      case "ordersDetail":
+        return <OrderDetail orderId={orderId} />;
       default:
         return (
           <ProductsPage
