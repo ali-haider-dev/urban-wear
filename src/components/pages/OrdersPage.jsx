@@ -20,9 +20,10 @@ export default function OrdersPage({
   const [isLoading, setIsLoading] = useState(true);
 
   const STATUS_MAP = {
-    0: { label: "Pending", color: "bg-yellow-100 text-yellow-800" },
-    1: { label: "Shipped", color: "bg-blue-100 text-blue-800" },
-    2: { label: "Delivered", color: "bg-green-100 text-green-800" },
+    0: { label: "PendingPayment", color: "bg-yellow-100 text-yellow-800" },
+    1: { label: "Processing", color: "bg-yellow-100 text-yellow-800" },
+    2: { label: "Shipped", color: "bg-blue-100 text-blue-800" },
+    3: { label: "Delivered", color: "bg-green-100 text-green-800" },
   };
 
   useEffect(() => {

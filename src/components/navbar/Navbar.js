@@ -1,9 +1,10 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { GlobalContext } from "../../context/GlobalState";
 import logo from "../../utils/logo2.png"; // Adjust the path as necessary
 const Navbar = ({ setUser }) => {
   const { cart } = useContext(GlobalContext);
+  const [userName,setUserName]=useState('')
   const navigate = useNavigate();
   const signOutHandler = async () => {
     await localStorage.removeItem("user");
@@ -11,7 +12,11 @@ const Navbar = ({ setUser }) => {
     setUser(null);
     navigate("/login");
   };
-
+useEffect(()=>{
+  const user = JSON.parse(localStorage.getItem('user'))
+  console.log("userdata",user)
+  setUserName(user.fullName)
+},[])
   return (
     <nav className="bg-[#454545] shadow-md px-6 py-1 pt-3 flex items-center justify-between sticky top-0 z-50">
       <Link
@@ -27,7 +32,7 @@ const Navbar = ({ setUser }) => {
       </Link>
       <li>
         <button className="py-1.5 rounded-md text-orange-600 font-bold transition rounded ml-[150px] mb-3">
-         <span style={{color:'#454545'}}>ffuckhfahfahfahfah</span> Hi John
+         <span style={{color:'#454545'}}>ffuckhfahfahfahfah</span> {userName}
         </button>
       </li>
       <ul className="flex items-center space-x-6">

@@ -4,7 +4,9 @@ import * as Yup from "yup";
 import "./payment.css";
 import { Post } from "../../Api";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 const PaymentInfo = () => {
+  const navigate = useNavigate()
   const formik = useFormik({
     initialValues: {
       address: "",
@@ -24,7 +26,7 @@ const PaymentInfo = () => {
         .matches(/^\d{10,15}$/, "Phone number must be 10-15 digits")
         .required("Phone number is required"),
     }),
-    onSubmit: async (values) => {
+    onSubmit: async (values, { resetForm }) => {
       console.log("Form submitted with values:", values);
       try {
         const token = localStorage.getItem("token");
@@ -46,7 +48,11 @@ const PaymentInfo = () => {
 
         if (response?.success) {
           console.log("Order placed successfully:", response.data);
+          toast.success("Order placed successfully")
+          resetForm()
+          navigate('/orders')
           // Optionally, redirect or show a success message
+
         } else {
           toast.error(`Error placing order: ${response.error}`);
         }

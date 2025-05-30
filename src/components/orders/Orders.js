@@ -99,14 +99,12 @@ function Orders() {
             </div>
 
             <div className="py-4 px-6 flex items-center justify-between">
-              <button className="text-white hover:text-blue-700  focus:outline-none bg-blue-500 hover:bg-white rounded-lg px-4 py-2">
-                Cancel Order
-              </button>
+              
               <div className="text-sm text-gray-600">
-                Paid using credit card ending with 7343
+                Payment type:Cash on delivery
               </div>
               <div className="font-semibold text-gray-900">
-                Total Order ammount $. {order.total.toFixed(0)}
+                Total Order ammount $. {order.total.toFixed(2)}
               </div>
             </div>
           </div>
